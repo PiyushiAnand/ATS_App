@@ -1,0 +1,5 @@
+{
+  "name": "CogniPath - Intelligent Tutoring System",
+  "description": "A comprehensive educational platform for Class 6 Mathematics featuring adaptive learning pathways, real-time mastery tracking using BKT, and student engagement monitoring via MediaPipe.",
+  "requestFramePermissions": ["camera"]
+}
