@@ -48,7 +48,13 @@ export const EngagementCheck: React.FC = () => {
       .then(() => setIsCameraActive(true))
       .catch((err) => {
         console.error("Camera error:", err);
-        setError("Camera access denied. Engagement check disabled.");
+        if (err.name === 'NotAllowedError' || err === 'Permission denied') {
+          setError("Camera permission denied. Please allow access in your browser settings to enable engagement tracking.");
+        } else if (err.name === 'NotFoundError') {
+          setError("No camera found. Engagement tracking disabled.");
+        } else {
+          setError("Camera access error. Engagement check disabled.");
+        }
       });
 
     return () => {

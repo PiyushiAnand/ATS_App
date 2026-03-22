@@ -16,11 +16,8 @@ import { LogOut, User, Settings, Bell } from 'lucide-react';
 export default function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [activeTopicId, setActiveTopicId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [learnerState, setLearnerState] = useState<LearnerState>(() => {
-    const saved = localStorage.getItem('learnerState');
-    if (saved) return JSON.parse(saved);
-    
-    // Initial state based on BKT P(L0)
     const initialMastery: Record<string, number> = {};
     KNOWLEDGE_COMPONENTS.forEach(kc => {
       initialMastery[kc.id] = kc.pL0;
@@ -32,12 +29,62 @@ export default function App() {
     };
   });
 
+  // Check auth on mount
   useEffect(() => {
-    localStorage.setItem('learnerState', JSON.stringify(learnerState));
-  }, [learnerState]);
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/user/me');
+        if (response.ok) {
+          const data = await response.json();
+          setUser({ name: data.name, email: data.email });
+          setLearnerState({
+            mastery: data.mastery || {},
+            completedTopics: data.completedTopics || []
+          });
+        }
+      } catch (err) {
+        console.error("Auth check failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
-  const handleLogin = (userData: { name: string; email: string }) => {
-    setUser(userData);
+  // Sync state to backend
+  useEffect(() => {
+    if (!user) return;
+    
+    const syncState = async () => {
+      try {
+        await fetch('/api/user/state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mastery: learnerState.mastery,
+            completedTopics: learnerState.completedTopics
+          }),
+        });
+      } catch (err) {
+        console.error("State sync failed", err);
+      }
+    };
+
+    const timeoutId = setTimeout(syncState, 2000); // Debounce sync
+    return () => clearTimeout(timeoutId);
+  }, [learnerState, user]);
+
+  const handleLogin = (userData: any) => {
+    setUser({ name: userData.name, email: userData.email });
+    setLearnerState({
+      mastery: userData.mastery || {},
+      completedTopics: userData.completedTopics || []
+    });
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setUser(null);
   };
 
   const handleAnswer = (isCorrect: boolean) => {
@@ -75,6 +122,14 @@ export default function App() {
     setActiveTopicId(null);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   if (!user) {
     return <Auth onLogin={handleLogin} />;
   }
@@ -107,7 +162,7 @@ export default function App() {
                 <User className="w-6 h-6 text-slate-400" />
               </div>
               <button 
-                onClick={() => setUser(null)}
+                onClick={handleLogout}
                 className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
                 title="Log Out"
               >
