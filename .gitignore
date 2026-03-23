@@ -1,2 +1,4 @@
 node_modules/
 .vite/
+server/node_modules/
+src/node_modules/
