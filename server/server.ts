@@ -3,7 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import app from "./server/app";
+import app from "./app";
 
 dotenv.config();
 
@@ -13,7 +13,11 @@ const PORT = 3000;
 async function startServer() {
   // Connect to MongoDB
   try {
+    console.log("Connecting to MongoDB...");
+    console.log("Using URI:", MONGODB_URI); // Log the URI to verify it's correct
     await mongoose.connect(MONGODB_URI);
+
+
     console.log("Connected to MongoDB");
   } catch (err) {
     console.error("MongoDB connection error:", err);

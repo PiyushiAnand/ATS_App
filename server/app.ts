@@ -3,6 +3,10 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
+// Import the new routes
+import lessonRoutes from "./routes/lessonRoutes"; 
+import assessmentRoutes from "./routes/assessmentRoutes";
+import responseRoutes from "./routes/responseRoutes";
 
 const app = express();
 
@@ -14,6 +18,10 @@ app.use(cookieParser());
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+// Mount the new routes
+app.use("/api/lessons", lessonRoutes);
+app.use("/api/assessments", assessmentRoutes);
+app.use("/api/responses", responseRoutes);
 
 // Health Check
 app.get("/api/health", (req, res) => {
