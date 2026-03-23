@@ -134,7 +134,7 @@ export default function App() {
     return <Auth onLogin={handleLogin} />;
   }
 
-  const activeSection = COURSE_CONTENT.find(s => s.id === activeTopicId);
+  // const activeSection = COURSE_CONTENT.find(s => s.id === activeTopicId);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -173,21 +173,22 @@ export default function App() {
         </div>
       </header>
 
-      <main>
-        {activeSection ? (
-          <Content 
-            section={activeSection} 
-            onBack={() => setActiveTopicId(null)}
-            onAnswer={handleAnswer}
-            onComplete={handleTopicComplete}
-          />
-        ) : (
-          <Pathway 
-            learnerState={learnerState} 
-            onSelectTopic={setActiveTopicId} 
-          />
-        )}
-      </main>
+    <main>
+      {activeTopicId ? (
+        <Content 
+          kcId={activeTopicId}   // 🔥 pass kcId directly
+          order={1}              // ⚠️ temporary (first subtopic)
+          onBack={() => setActiveTopicId(null)}
+          onAnswer={handleAnswer}
+          onComplete={handleTopicComplete}
+        />
+      ) : (
+        <Pathway 
+          learnerState={learnerState} 
+          onSelectTopic={setActiveTopicId} 
+        />
+      )}
+    </main>
 
       {/* Engagement Check Component */}
       <EngagementCheck />

@@ -27,7 +27,7 @@ export function updateMastery(
 
 export const KNOWLEDGE_COMPONENTS: KC[] = [
   {
-    id: 'kc1',
+    id: 'KC1',
     title: 'Data Representation',
     description: 'Introductory data handling and bar graphs.',
     pL0: 0.35,
@@ -36,7 +36,7 @@ export const KNOWLEDGE_COMPONENTS: KC[] = [
     pS: 0.10,
   },
   {
-    id: 'kc2',
+    id: 'KC2',
     title: 'Pie Charts',
     description: 'Understanding and interpreting pie charts.',
     pL0: 0.25,
@@ -45,7 +45,7 @@ export const KNOWLEDGE_COMPONENTS: KC[] = [
     pS: 0.12,
   },
   {
-    id: 'kc3',
+    id: 'KC3',
     title: 'Basic Probability',
     description: 'Simple random experiments and probability.',
     pL0: 0.30,

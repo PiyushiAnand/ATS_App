@@ -8,6 +8,7 @@ const router = express.Router();
 router.get("/:kcId/:order", authenticate, async (req, res) => {
   try {
     const { kcId, order } = req.params;
+    
     const lesson = await Lesson.findOne({ kcId, order: parseInt(order) });
     
     if (!lesson) {
