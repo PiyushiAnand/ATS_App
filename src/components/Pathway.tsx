@@ -1,91 +1,173 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Circle, Lock, PlayCircle, Trophy, BarChart3 } from 'lucide-react';
+import { CheckCircle2, Lock, PlayCircle, Trophy, BarChart3 } from 'lucide-react';
 import { KNOWLEDGE_COMPONENTS } from '../services/bkt';
 import { LearnerState } from '../types';
 
+interface Lesson {
+  _id: string;
+  kcId: string;
+  subtopicName: string;
+  order: number;
+}
+
 interface PathwayProps {
   learnerState: LearnerState;
-  onSelectTopic: (topicId: string) => void;
+  onSelectTopic: (kcId: string, order: number) => void;
 }
 
 export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic }) => {
+  const [lessonsMap, setLessonsMap] = useState<Record<string, Lesson[]>>({});
+
+  // 🔥 Fetch all subtopics for each KC
+  useEffect(() => {
+    const fetchLessons = async () => {
+      const map: Record<string, Lesson[]> = {};
+
+      for (const kc of KNOWLEDGE_COMPONENTS) {
+        try {
+          const res = await fetch(`/api/lessons/${kc.id}`, {
+            credentials: 'include',
+          });
+          console.log(`Fetching lessons for ${kc.id}, status:`, res.status);
+
+          if (!res.ok) throw new Error(`Failed to fetch lessons for ${kc.id}`);
+          const data = await res.json();
+          map[kc.id] = data;
+        } catch (err) {
+          console.error('Failed for', kc.id);
+          map[kc.id] = [];
+        }
+      }
+
+      setLessonsMap(map);
+    };
+
+    fetchLessons();
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto py-12 px-6">
+      {/* HEADER */}
       <div className="flex items-center justify-between mb-12">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">Learning Pathway</h2>
           <p className="text-slate-500 mt-1">Master each concept to unlock the next level.</p>
         </div>
+
         <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
           <div className="text-right">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall Progress</p>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              Overall Progress
+            </p>
             <p className="text-xl font-bold text-indigo-600">
-              {Math.round((learnerState.completedTopics.length / KNOWLEDGE_COMPONENTS.length) * 100)}%
+              {Math.round(
+                (learnerState.completedTopics.length / KNOWLEDGE_COMPONENTS.length) * 100
+              )}
+              %
             </p>
           </div>
           <Trophy className="w-8 h-8 text-amber-400" />
         </div>
       </div>
 
-      <div className="relative space-y-8">
-        {/* Vertical Line */}
-        <div className="absolute left-8 top-4 bottom-4 w-0.5 bg-slate-200" />
-
+      {/* KC LIST */}
+      <div className="space-y-8">
         {KNOWLEDGE_COMPONENTS.map((kc, index) => {
-          const isCompleted = learnerState.completedTopics.includes(kc.id);
-          const isLocked = index > 0 && !learnerState.completedTopics.includes(KNOWLEDGE_COMPONENTS[index - 1].id);
           const mastery = learnerState.mastery[kc.id] || kc.pL0;
+
+          // KC locking
+          const prevKC = KNOWLEDGE_COMPONENTS[index - 1];
+          const prevLessons = prevKC ? (lessonsMap[prevKC.id] || []).slice().sort((a, b) => a.order - b.order) : [];
+          const prevKCCompleted =
+            index === 0 ||
+            (prevLessons.length > 0 &&
+              learnerState.completedTopics.includes(
+                `${prevKC?.id}-${prevLessons[prevLessons.length - 1].order}`
+              ));
+
+          const isKCLocked = !prevKCCompleted;
+
+          const lessons = (lessonsMap[kc.id] || []).slice().sort((a, b) => a.order - b.order);
 
           return (
             <motion.div
               key={kc.id}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`relative flex items-start gap-8 p-6 rounded-3xl border transition-all ${
-                isLocked 
-                  ? 'bg-slate-50 border-slate-100 opacity-60 grayscale' 
-                  : 'bg-white border-slate-100 shadow-sm hover:shadow-md hover:border-indigo-100 cursor-pointer'
+              className={`p-6 rounded-3xl border ${
+                isKCLocked ? 'bg-slate-50 opacity-60' : 'bg-white shadow-sm'
               }`}
-              onClick={() => !isLocked && onSelectTopic(kc.id)}
             >
-              {/* Icon / Status */}
-              <div className={`relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
-                isCompleted ? 'bg-emerald-50 text-emerald-600' : 
-                isLocked ? 'bg-slate-200 text-slate-400' : 'bg-indigo-50 text-indigo-600'
-              }`}>
-                {isCompleted ? <CheckCircle2 className="w-8 h-8" /> : 
-                 isLocked ? <Lock className="w-8 h-8" /> : <PlayCircle className="w-8 h-8" />}
-              </div>
+              {/* KC HEADER */}
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xl font-bold">{kc.title}</h3>
 
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-bold text-slate-900">{kc.title}</h3>
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-slate-400" />
-                    <span className="text-sm font-semibold text-slate-500">
-                      Mastery: {Math.round(mastery * 100)}%
-                    </span>
-                  </div>
-                </div>
-                <p className="text-slate-500 text-sm mb-4">{kc.description}</p>
-                
-                {/* Progress Bar */}
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${mastery * 100}%` }}
-                    className={`h-full ${isCompleted ? 'bg-emerald-500' : 'bg-indigo-500'}`}
-                  />
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-slate-400" />
+                  <span className="text-sm text-slate-500">
+                    {Math.round(mastery * 100)}%
+                  </span>
                 </div>
               </div>
 
-              {!isLocked && (
-                <div className="self-center">
-                  <ArrowRight className="w-6 h-6 text-slate-300" />
-                </div>
-              )}
+              <p className="text-sm text-slate-500 mb-4">{kc.description}</p>
+
+              {/* Progress Bar */}
+              <div className="w-full h-2 bg-slate-100 rounded-full mb-4">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${mastery * 100}%` }}
+                  className="h-full bg-indigo-500"
+                />
+              </div>
+
+              {/* 🔥 SUBTOPICS */}
+              <div className="space-y-2">
+                {lessons.map((lesson, i) => {
+                  console.log('Checking completion for', `${kc.id}-${lesson.order}`);
+                  console.log('Completed topics:', learnerState.completedTopics);
+                  const isLocked =lesson.order !== 1 &&
+  !learnerState.completedTopics.includes(`${kc.id}-${lesson.order - 1}`);
+
+                  const isCompleted =
+                    learnerState.completedTopics.includes(`${kc.id}-${lesson.order}`);
+
+                  return (
+                    <div
+                      key={lesson._id}
+                      onClick={() =>
+                        !isLocked && onSelectTopic(kc.id, lesson.order)
+                      }
+                      className={`flex justify-between items-center px-4 py-2 rounded-lg border ${
+                        isLocked
+                          ? 'bg-slate-50 opacity-50'
+                          : 'hover:bg-indigo-50 cursor-pointer'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {isCompleted ? (
+                          <CheckCircle2 className="text-green-500 w-4 h-4" />
+                        ) : isLocked ? (
+                          <Lock className="text-slate-400 w-4 h-4" />
+                        ) : (
+                          <PlayCircle className="text-indigo-500 w-4 h-4" />
+                        )}
+
+                        <span className="text-sm">
+                          {lesson.subtopicName}
+                        </span>
+                      </div>
+
+                      {!isLocked && (
+                        <span className="text-xs text-slate-400">
+                          Start →
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </motion.div>
           );
         })}
@@ -93,9 +175,3 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
     </div>
   );
 };
-
-const ArrowRight = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-  </svg>
-);

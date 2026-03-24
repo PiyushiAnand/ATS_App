@@ -22,16 +22,14 @@ interface ContentSection {
 interface ContentProps {
   kcId: string;
   order: number;
-  lessonId: string; // ✅ IMPORTANT (needed for assessment API)
   onBack: () => void;
-  onComplete: (score: number) => void;
+  onComplete: (kcId: string, order: number, score: number) => void;
   onAnswer: (isCorrect: boolean) => void;
 }
 
 export const Content: React.FC<ContentProps> = ({
   kcId,
   order,
-  lessonId,
   onBack,
   onComplete,
   onAnswer
@@ -198,7 +196,17 @@ useEffect(() => {
         {/* NO QUESTIONS */}
         {step === 'assessment' && section.questions.length === 0 && (
           <div className="text-center text-slate-500">
-            No questions available yet.
+            <p>No questions available yet.</p>
+            <button
+              onClick={() => {
+                setIsFinished(true);
+                setShowConfetti(true);
+                onComplete(kcId, order, score);
+              }}
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded"
+            >
+              Continue
+            </button>
           </div>
         )}
 
@@ -253,7 +261,7 @@ useEffect(() => {
             </p>
 
             <button
-              onClick={() => onComplete(score)}
+              onClick={() => onComplete(kcId, order, score)}
               className="bg-green-600 text-white px-4 py-2 rounded"
             >
               Continue

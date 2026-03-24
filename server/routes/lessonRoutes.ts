@@ -22,8 +22,9 @@ router.get("/:kcId/:order", authenticate, async (req, res) => {
 });
 
 // Get all lessons for a specific Knowledge Component (to build a table of contents)
-router.get("/topic/:kcId", authenticate, async (req, res) => {
-  try {
+router.get("/:kcId", authenticate, async (req, res) => {
+  console.log("Fetching lessons for KC:", req.params.kcId); // 🔥 Debug log
+    try {
     const lessons = await Lesson.find({ kcId: req.params.kcId }).sort({ order: 1 });
     res.json(lessons);
   } catch (err) {

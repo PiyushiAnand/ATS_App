@@ -9,34 +9,40 @@ import { Pathway } from './components/Pathway';
 import { Content } from './components/Content';
 import { EngagementCheck } from './components/EngagementCheck';
 import { KNOWLEDGE_COMPONENTS, updateMastery } from './services/bkt';
-import { COURSE_CONTENT } from './data/content';
 import { LearnerState } from './types';
-import { LogOut, User, Settings, Bell } from 'lucide-react';
+import { LogOut, User, Bell } from 'lucide-react';
 
 export default function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  const [activeTopicId, setActiveTopicId] = useState<string | null>(null);
+  const [activeKC, setActiveKC] = useState<string | null>(null);
+  const [activeOrder, setActiveOrder] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+
   const [learnerState, setLearnerState] = useState<LearnerState>(() => {
     const initialMastery: Record<string, number> = {};
     KNOWLEDGE_COMPONENTS.forEach(kc => {
       initialMastery[kc.id] = kc.pL0;
     });
-    
+
     return {
       mastery: initialMastery,
       completedTopics: []
     };
   });
 
-  // Check auth on mount
+  // ✅ AUTH CHECK
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/user/me');
+        const response = await fetch('/api/user/me', {
+          credentials: 'include'
+        });
+
         if (response.ok) {
           const data = await response.json();
+
           setUser({ name: data.name, email: data.email });
+
           setLearnerState({
             mastery: data.mastery || {},
             completedTopics: data.completedTopics || []
@@ -48,18 +54,20 @@ export default function App() {
         setLoading(false);
       }
     };
+
     checkAuth();
   }, []);
 
-  // Sync state to backend
+  // ✅ SYNC TO BACKEND
   useEffect(() => {
     if (!user) return;
-    
+
     const syncState = async () => {
       try {
         await fetch('/api/user/state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             mastery: learnerState.mastery,
             completedTopics: learnerState.completedTopics
@@ -70,58 +78,51 @@ export default function App() {
       }
     };
 
-    const timeoutId = setTimeout(syncState, 2000); // Debounce sync
+    const timeoutId = setTimeout(syncState, 2000);
     return () => clearTimeout(timeoutId);
   }, [learnerState, user]);
 
+  // ✅ LOGIN
   const handleLogin = (userData: any) => {
     setUser({ name: userData.name, email: userData.email });
+
     setLearnerState({
       mastery: userData.mastery || {},
       completedTopics: userData.completedTopics || []
     });
   };
 
+  // ✅ LOGOUT
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
     setUser(null);
   };
 
+  // ✅ BKT UPDATE
   const handleAnswer = (isCorrect: boolean) => {
-    if (!activeTopicId) return;
-    
-    const kc = KNOWLEDGE_COMPONENTS.find(k => k.id === activeTopicId);
+    if (!activeKC) return;
+
+    const kc = KNOWLEDGE_COMPONENTS.find(k => k.id === activeKC);
     if (!kc) return;
 
     setLearnerState(prev => {
-      const currentMastery = prev.mastery[activeTopicId];
+      const currentMastery = prev.mastery[activeKC];
       const newMastery = updateMastery(currentMastery, isCorrect, kc);
-      
+
       return {
         ...prev,
         mastery: {
           ...prev.mastery,
-          [activeTopicId]: newMastery
+          [activeKC]: newMastery
         }
       };
     });
   };
 
-  const handleTopicComplete = (score: number) => {
-    if (!activeTopicId) return;
-
-    setLearnerState(prev => {
-      const isAlreadyCompleted = prev.completedTopics.includes(activeTopicId);
-      if (isAlreadyCompleted) return prev;
-
-      return {
-        ...prev,
-        completedTopics: [...prev.completedTopics, activeTopicId]
-      };
-    });
-    setActiveTopicId(null);
-  };
-
+  // ✅ LOADING
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -130,17 +131,18 @@ export default function App() {
     );
   }
 
+  // ✅ NOT LOGGED IN
   if (!user) {
     return <Auth onLogin={handleLogin} />;
   }
 
-  // const activeSection = COURSE_CONTENT.find(s => s.id === activeTopicId);
-
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
-      {/* Header */}
+
+      {/* HEADER */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
@@ -149,48 +151,74 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="text-slate-400 hover:text-slate-600 transition-colors">
+            <button className="text-slate-400 hover:text-slate-600">
               <Bell className="w-5 h-5" />
             </button>
+
             <div className="h-6 w-px bg-slate-200" />
+
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-slate-900">{user.name}</p>
                 <p className="text-xs text-slate-500">{user.email}</p>
               </div>
-              <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border border-slate-200">
+
+              <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border">
                 <User className="w-6 h-6 text-slate-400" />
               </div>
-              <button 
+
+              <button
                 onClick={handleLogout}
-                className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
-                title="Log Out"
+                className="p-2 text-slate-400 hover:text-rose-500"
               >
                 <LogOut className="w-5 h-5" />
               </button>
             </div>
           </div>
+
         </div>
       </header>
 
-    <main>
-      {activeTopicId ? (
-        <Content 
-          kcId={activeTopicId}   // 🔥 pass kcId directly
-          order={1}              // ⚠️ temporary (first subtopic)
-          onBack={() => setActiveTopicId(null)}
-          onAnswer={handleAnswer}
-          onComplete={handleTopicComplete}
-        />
-      ) : (
-        <Pathway 
-          learnerState={learnerState} 
-          onSelectTopic={setActiveTopicId} 
-        />
-      )}
-    </main>
+      {/* MAIN */}
+      <main>
+        {activeKC && activeOrder !== null ? (
+          <Content
+            kcId={activeKC}
+            order={activeOrder}
 
-      {/* Engagement Check Component */}
+            onBack={() => {
+              setActiveKC(null);
+              setActiveOrder(null);
+            }}
+
+            onAnswer={handleAnswer}
+
+            // ✅ FIXED LOGIC HERE
+            onComplete={(kcId, order, score) => {
+              setLearnerState(prev => ({
+                ...prev,
+                completedTopics: Array.from(new Set([
+                  ...prev.completedTopics,
+                  `${kcId}-${order}`
+                ]))
+              }));
+
+              // 🔥 ALWAYS go back to pathway
+              setActiveKC(null);
+              setActiveOrder(null);
+            }}
+          />
+        ) : (
+          <Pathway
+            learnerState={learnerState}
+            onSelectTopic={(kcId, order) => {
+              setActiveKC(kcId);
+              setActiveOrder(order);
+            }}
+          />
+        )}
+      </main>
+
       <EngagementCheck />
     </div>
   );
