@@ -7,16 +7,28 @@ import { authenticate } from "../middleware/auth.ts";
 const router = express.Router();
 
 // Fetch the assessment details (and populated questions) for a specific lesson
+import mongoose from 'mongoose';
+
 router.get("/lesson/:lessonId", authenticate, async (req, res) => {
   try {
-    const assessment = await Assessment.findOne({ lessonId: req.params.lessonId })
-      .populate("questions", "difficulty kcId options questionText hint mediaUrl"); 
-      // Note: We deliberately EXCLUDE 'correctAnswer' from populate so students can't cheat!
+    const { lessonId } = req.params;
 
-    if (!assessment) return res.status(404).json({ error: "Assessment not found" });
-    
+    // ✅ Validate ObjectId BEFORE using it
+    if (!mongoose.Types.ObjectId.isValid(lessonId)) {
+      return res.status(400).json({ error: "Invalid lessonId" });
+    }
+
+    const assessment = await Assessment.findOne({
+      lessonId: new mongoose.Types.ObjectId(lessonId),
+    }).populate("questions"); // 🔥 remove field filtering temporarily
+
+    if (!assessment) {
+      return res.status(404).json({ error: "Assessment not found" });
+    }
+
     res.json(assessment);
   } catch (err) {
+    console.error("Assessment error:", err); // 🔥 IMPORTANT
     res.status(500).json({ error: err.message });
   }
 });
