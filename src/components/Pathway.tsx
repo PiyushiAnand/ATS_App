@@ -62,7 +62,7 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
             </p>
             <p className="text-xl font-bold text-indigo-600">
               {Math.round(
-                (learnerState.completedTopics.length / KNOWLEDGE_COMPONENTS.length) * 100
+                (learnerState.completedTopics.length / 13) * 100
               )}
               %
             </p>
