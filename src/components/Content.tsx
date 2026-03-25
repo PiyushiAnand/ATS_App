@@ -40,7 +40,6 @@ export const Content: React.FC<ContentProps> = ({
   const [step, setStep] = useState<'video' | 'examples' | 'assessment'>('video');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-
   const [showHint, setShowHint] = useState(false);
   const [hintUnlocked, setHintUnlocked] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -83,10 +82,12 @@ export const Content: React.FC<ContentProps> = ({
                 _id: q._id,
                 text: q.questionText,
                 options: q.options || [],
-                hint: q.hint,
+                hint: q.hint?.text || "", // ✅ FIXED
               })) || [];
           }
         }
+
+        
 
         setSection({
           id: data.kcId,
@@ -134,7 +135,6 @@ export const Content: React.FC<ContentProps> = ({
             setHintUnlocked(true);
             clearInterval(interval);
           }
-
           if (qNum === 5 && newTime >= 20) {
             setHintUnlocked(true);
             clearInterval(interval);
@@ -152,7 +152,6 @@ export const Content: React.FC<ContentProps> = ({
   if (!section) return <div className="p-10 text-center text-red-500">Failed</div>;
 
   const currentQuestion = section.questions[currentQuestionIndex];
-
   // SUBMIT
   const handleAnswerSubmit = async () => {
     if (!currentQuestion || selectedOption === null) return;
@@ -213,7 +212,45 @@ export const Content: React.FC<ContentProps> = ({
       </button>
 
       <AnimatePresence mode="wait">
+      {/* VIDEO */}
+{step === 'video' && (
+  <motion.div key="video">
+    <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
 
+    {section.videoUrl && (
+      <div className="aspect-video mb-4">
+        <iframe className="w-full h-full" src={section.videoUrl} />
+      </div>
+    )}
+
+    <p className="mb-4">{section.explanation}</p>
+
+    <button
+      onClick={() => setStep('examples')}
+      className="bg-indigo-600 text-white px-4 py-2 rounded"
+    >
+      Next
+    </button>
+  </motion.div>
+)}
+
+{/* EXAMPLES */}
+{step === 'examples' && (
+  <motion.div key="examples">
+    <h2 className="text-xl font-bold mb-4">Examples</h2>
+
+    {section.examples.map((ex, i) => (
+      <div key={i} className="mb-2">{ex}</div>
+    ))}
+
+    <button
+      onClick={() => setStep('assessment')}
+      className="bg-indigo-600 text-white px-4 py-2 rounded"
+    >
+      Start Assessment
+    </button>
+  </motion.div>
+)}
         {step === 'assessment' && section.questions.length > 0 && !isFinished && (
           <motion.div key="assessment">
             <p className="mb-4">{currentQuestion.text}</p>
@@ -283,7 +320,10 @@ export const Content: React.FC<ContentProps> = ({
             )}
 
             {showHint && currentQuestion.hint && (
-              <p className="mt-3 text-yellow-600">{currentQuestion.hint}</p>
+              <div className="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500">
+                <p className="font-bold">Hint:</p>
+                <p>{currentQuestion.hint}</p>
+              </div>
             )}
           </motion.div>
         )}

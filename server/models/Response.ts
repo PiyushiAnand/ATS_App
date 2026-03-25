@@ -7,10 +7,8 @@ export interface IResponse extends Document {
   kcId: "KC1" | "KC2" | "KC3"; // The specific Knowledge Component being tested
   correctness: boolean; // True if the student got it right, False if wrong
   timeTaken: number; // Time in seconds spent on the question
-  hintCount: number; // Number of hints used (0 if none)
+  hintTaken: boolean; // Whether a hint was taken (true if yes, false if no)
   attemptCount: number; // Which attempt this was (1 for first try, etc.)
-  errorType?: string; // Optional: To track specific misconceptions (e.g., "calculation", "concept")
-  faceExpression?: "happy" | "angry" | "sad" | "surprised" | "disgust" | "confusion" | "neutral"; // Optional: For your emotion detection model
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,22 +39,13 @@ const responseSchema: Schema<IResponse> = new mongoose.Schema(
       type: Number,
       required: true, // Crucial for analyzing if a student is guessing (too fast) or struggling (too slow)
     },
-    hintCount: {
-      type: Number,
-      default: 0, // Defaults to 0 if no hints were unlocked or used
+    hintTaken: {
+      type: Boolean,
+      default: false, // Defaults to false if no hints were unlocked or used
     },
     attemptCount: {
       type: Number,
       default: 1,
-    },
-    errorType: {
-      type: String,
-      default: null, // Categorize the mistake to provide targeted remedial content
-    },
-    faceExpression: {
-      type: String,
-      enum: ["happy", "angry", "sad", "surprised", "disgust", "confusion", "neutral"],
-      default: "neutral", // Ties directly into your AffectNet / MobileNet V2 emotion detection mentioned in your PDF!
     },
   },
   {

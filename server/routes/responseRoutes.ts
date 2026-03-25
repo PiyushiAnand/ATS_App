@@ -25,7 +25,7 @@ router.post("/submit", authenticate, async (req, res) => {
       kcId,
       correctness: isCorrect,
       timeTaken,
-      hintCount,
+      hintTaken: hintCount > 0, // Convert hintCount to a boolean for backward compatibility
       attemptCount
     });
     await newResponse.save();
