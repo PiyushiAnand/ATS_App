@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
+import { seedRemedial } from '../data/seedRemedial';
 
 interface Question {
   _id: string;
@@ -22,22 +23,28 @@ interface ContentSection {
 interface ContentProps {
   kcId: string;
   order: number;
+  kcMastery: number;
+  isLastOrder: boolean;
   onBack: () => void;
   onComplete: (kcId: string, order: number, score: number) => void;
   onAnswer: (isCorrect: boolean) => void;
+  onRestartKC: (kcId: string) => void;
 }
 
 export const Content: React.FC<ContentProps> = ({
   kcId,
   order,
+  kcMastery,
+  isLastOrder,
   onBack,
   onComplete,
-  onAnswer
+  onAnswer,
+  onRestartKC
 }) => {
   const [section, setSection] = useState<ContentSection | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [step, setStep] = useState<'video' | 'examples' | 'assessment'>('video');
+  const [step, setStep] = useState<'video' | 'examples' | 'assessment' | 'remedial'>('video');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showHint, setShowHint] = useState(false);
@@ -328,15 +335,72 @@ export const Content: React.FC<ContentProps> = ({
           </motion.div>
         )}
 
+        {step === 'remedial' && (
+          <motion.div key="remedial">
+            {(() => {
+              const remedialData = seedRemedial.find(r => r.kcId === kcId);
+              if (!remedialData) {
+                return (
+                  <div className="text-center">
+                    <p>No remedial content found.</p>
+                    <button
+                      onClick={() => onRestartKC(kcId)}
+                      className="bg-indigo-600 text-white px-4 py-2 rounded mt-4"
+                    >
+                      Restart KC
+                    </button>
+                  </div>
+                );
+              }
+              return (
+                <div>
+                  <h2 className="text-2xl font-bold mb-4">{remedialData.title}</h2>
+                  {remedialData.videoUrl && (
+                    <div className="aspect-video mb-4">
+                      <iframe className="w-full h-full" src={remedialData.videoUrl} />
+                    </div>
+                  )}
+                  <p className="mb-6 text-slate-700 whitespace-pre-line">{remedialData.explanation}</p>
+                  <button
+                    onClick={() => onRestartKC(kcId)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700"
+                  >
+                    Restart Knowledge Component
+                  </button>
+                </div>
+              );
+            })()}
+          </motion.div>
+        )}
+
         {isFinished && (
           <motion.div key="finished" className="text-center">
-            <h2 className="text-2xl font-bold mb-2">Completed!</h2>
-            <button
-              onClick={() => onComplete(kcId, order, score)}
-              className="bg-green-600 text-white px-4 py-2 rounded"
-            >
-              Continue
-            </button>
+            {isLastOrder && kcMastery < 0.8 ? (
+              <>
+                <h2 className="text-2xl font-bold mb-2">Needs Review</h2>
+                <p className="mb-6 text-slate-600">Your mastery is {Math.round(kcMastery * 100)}%, which is below the 80% threshold. Let's review the core concepts.</p>
+                <button
+                  onClick={() => {
+                    setIsFinished(false);
+                    setStep('remedial');
+                    setShowConfetti(false);
+                  }}
+                  className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700"
+                >
+                  Go to Remedial Content
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold mb-2">Completed!</h2>
+                <button
+                  onClick={() => onComplete(kcId, order, score)}
+                  className="bg-green-600 text-white px-4 py-2 rounded"
+                >
+                  Continue
+                </button>
+              </>
+            )}
           </motion.div>
         )}
 

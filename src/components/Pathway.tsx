@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, Lock, PlayCircle, Trophy, BarChart3 } from 'lucide-react';
-import { KNOWLEDGE_COMPONENTS } from '../services/bkt';
+import { KNOWLEDGE_COMPONENTS, KC_LAST_ORDER } from '../services/bkt';
 import { LearnerState } from '../types';
 
 interface Lesson {
@@ -50,11 +50,6 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
     fetchLessons();
   }, []);
 
-  const KC_LAST_ORDER: Record<string, number> = {
-    KC1: 4,
-    KC2: 3,
-    KC3: 6,
-  };
   const fetchMastery = async () => { 
     try { 
       const res = await fetch('/api/mastery/get_mastery', { credentials: 'include', }); 

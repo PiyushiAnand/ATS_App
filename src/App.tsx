@@ -8,7 +8,7 @@ import { Auth } from './components/Auth';
 import { Pathway } from './components/Pathway';
 import { Content } from './components/Content';
 import { EngagementCheck } from './components/EngagementCheck';
-import { KNOWLEDGE_COMPONENTS, updateMastery } from './services/bkt';
+import { KNOWLEDGE_COMPONENTS, updateMastery, KC_LAST_ORDER } from './services/bkt';
 import { LearnerState } from './types';
 import { LogOut, User, Bell } from 'lucide-react';
 
@@ -192,6 +192,18 @@ export default function App() {
             }}
 
             onAnswer={handleAnswer}
+
+            // ✅ REMEDIAL LOGIC HERE
+            kcMastery={learnerState.mastery[activeKC] || 0}
+            isLastOrder={activeOrder === KC_LAST_ORDER[activeKC]}
+            onRestartKC={(kcId) => {
+              setLearnerState(prev => ({
+                ...prev,
+                completedTopics: prev.completedTopics.filter(t => !t.startsWith(`${kcId}-`))
+              }));
+              setActiveKC(null);
+              setActiveOrder(null);
+            }}
 
             // ✅ FIXED LOGIC HERE
             onComplete={(kcId, order, score) => {

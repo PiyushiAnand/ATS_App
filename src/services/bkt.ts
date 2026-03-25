@@ -54,3 +54,9 @@ export const KNOWLEDGE_COMPONENTS: KC[] = [
     pS: 0.10,
   },
 ];
+
+export const KC_LAST_ORDER: Record<string, number> = {
+  KC1: 4,
+  KC2: 3,
+  KC3: 6,
+};
