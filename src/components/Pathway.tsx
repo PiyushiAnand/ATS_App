@@ -146,12 +146,11 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
                 {lessons.map((lesson, i) => {
                   console.log('Checking completion for', `${kc.id}-${lesson.order}`);
                   console.log('Completed topics:', learnerState.completedTopics);
-                  let isLocked =
-  !learnerState.completedTopics.includes(`${kc.id}-${lesson.order - 1}`);
-                  
-                  if (kc.id === 'KC1' && lesson.order === 1) {
-                    // First lesson of KC1 is always unlocked
-                    isLocked = false;
+                  let isLocked = false;
+                  if (lesson.order === 1) {
+                    isLocked = isKCLocked;
+                  } else {
+                    isLocked = !learnerState.completedTopics.includes(`${kc.id}-${lesson.order - 1}`);
                   }
                   const isCompleted =
                     learnerState.completedTopics.includes(`${kc.id}-${lesson.order}`);
