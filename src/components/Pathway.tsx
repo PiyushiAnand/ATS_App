@@ -18,6 +18,10 @@ interface PathwayProps {
 
 export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic }) => {
   const [lessonsMap, setLessonsMap] = useState<Record<string, Lesson[]>>({});
+  const [masteryState, setMasteryState] = useState(learnerState.mastery);
+  const [completedTopicsState, setCompletedTopicsState] = useState(
+    learnerState.completedTopics
+  );
 
   // 🔥 Fetch all subtopics for each KC
   useEffect(() => {
@@ -45,6 +49,21 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
 
     fetchLessons();
   }, []);
+
+  const KC_LAST_ORDER: Record<string, number> = {
+    KC1: 4,
+    KC2: 3,
+    KC3: 6,
+  };
+  const fetchMastery = async () => { 
+    try { 
+      const res = await fetch('/api/mastery/get_mastery', { credentials: 'include', }); 
+    if (!res.ok) throw new Error('Failed to fetch mastery'); 
+    const data = await res.json(); console.log("MASTERYYYY:", data); 
+    setMasteryState(data.mastery || {}); setCompletedTopicsState(data.completedTopics || []); 
+  } 
+    catch (err) { console.error('Mastery fetch failed:', err); } 
+  };
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-6">
@@ -74,6 +93,7 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
       {/* KC LIST */}
       <div className="space-y-8">
         {KNOWLEDGE_COMPONENTS.map((kc, index) => {
+          learnerState.mastery[kc.id] = masteryState[kc.id] || kc.pL0; // Update mastery from state
           const mastery = learnerState.mastery[kc.id] || kc.pL0;
 
           // KC locking
@@ -81,13 +101,12 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
           const prevLessons = prevKC ? (lessonsMap[prevKC.id] || []).slice().sort((a, b) => a.order - b.order) : [];
           const prevKCCompleted =
             index === 0 ||
-            (prevLessons.length > 0 &&
-              learnerState.completedTopics.includes(
-                `${prevKC?.id}-${prevLessons[prevLessons.length - 1].order}`
-              ));
+            learnerState.completedTopics.includes(
+              `${prevKC.id}-${KC_LAST_ORDER[prevKC.id]}`
+            );
 
           const isKCLocked = !prevKCCompleted;
-
+          
           const lessons = (lessonsMap[kc.id] || []).slice().sort((a, b) => a.order - b.order);
 
           return (
@@ -127,9 +146,13 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
                 {lessons.map((lesson, i) => {
                   console.log('Checking completion for', `${kc.id}-${lesson.order}`);
                   console.log('Completed topics:', learnerState.completedTopics);
-                  const isLocked =lesson.order !== 1 &&
+                  let isLocked =
   !learnerState.completedTopics.includes(`${kc.id}-${lesson.order - 1}`);
-
+                  
+                  if (kc.id === 'KC1' && lesson.order === 1) {
+                    // First lesson of KC1 is always unlocked
+                    isLocked = false;
+                  }
                   const isCompleted =
                     learnerState.completedTopics.includes(`${kc.id}-${lesson.order}`);
 

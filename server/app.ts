@@ -7,6 +7,7 @@ import userRoutes from "./routes/user";
 import lessonRoutes from "./routes/lessonRoutes"; 
 import assessmentRoutes from "./routes/assessmentRoutes";
 import responseRoutes from "./routes/responseRoutes";
+import masteryRoute from "./routes/masteryRoute";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/lessons", lessonRoutes);
 app.use("/api/assessments", assessmentRoutes);
 app.use("/api/responses", responseRoutes);
+app.use("/api/mastery", masteryRoute);
 
 // Health Check
 app.get("/api/health", (req, res) => {
