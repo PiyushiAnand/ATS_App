@@ -40,82 +40,105 @@ export const Content: React.FC<ContentProps> = ({
   const [step, setStep] = useState<'video' | 'examples' | 'assessment'>('video');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
   const [showHint, setShowHint] = useState(false);
-  const [score, setScore] = useState(0); // ⚠️ will remain 0 (no correct answers)
+  const [hintUnlocked, setHintUnlocked] = useState(false);
+  const [timer, setTimer] = useState(0);
+
+  const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
   // 🔥 Fetch lesson + assessment
-useEffect(() => {
-  const fetchLesson = async () => {
-    try {
-      // 1️⃣ Fetch lesson
-      const res = await fetch(`/api/lessons/${kcId}/${order}`, {
-        credentials: 'include',
-      });
-
-      if (!res.ok) throw new Error('Failed to fetch lesson');
-
-      const data = await res.json();
-      console.log("Lesson data:", data);
-
-      // 🔥 Extract lessonId from lesson response
-      const lessonId = data._id;
-
-      if (!lessonId) {
-        console.error("Lesson ID missing from lesson API");
-        return;
-      }
-
-      // 2️⃣ Fetch assessment using lessonId
-      let questions: Question[] = [];
-
+  useEffect(() => {
+    const fetchLesson = async () => {
       try {
-        const assessRes = await fetch(`/api/assessments/lesson/${lessonId}`, {
+        const res = await fetch(`/api/lessons/${kcId}/${order}`, {
           credentials: 'include',
         });
 
-        console.log("Assessment status:", assessRes.status);
+        if (!res.ok) throw new Error('Failed to fetch lesson');
 
-        if (assessRes.ok) {
-          const assessData = await assessRes.json();
-          console.log("Assessment data:", assessData);
+        const data = await res.json();
+        const lessonId = data._id;
 
-          questions =
-            assessData?.questions?.map((q: any) => ({
-              text: q.questionText,   // ✅ matches your Content model
-              options: q.options || [],
-              hint: q.hint,
-            })) || [];
+        let questions: Question[] = [];
+
+        if (lessonId) {
+          try {
+            const assessRes = await fetch(`/api/assessments/lesson/${lessonId}`, {
+              credentials: 'include',
+            });
+
+            if (assessRes.ok) {
+              const assessData = await assessRes.json();
+
+              questions =
+                assessData?.questions?.slice(0, 5).map((q: any) => ({
+                  text: q.questionText,
+                  options: q.options || [],
+                  hint: q.hint,
+                })) || [];
+            }
+          } catch (err) {
+            console.error("Assessment fetch failed:", err);
+          }
         }
+
+        const formatted: ContentSection = {
+          id: data.kcId,
+          title: data.subtopicName,
+          videoUrl: data.videoUrl || '',
+          explanation: data.learningContent,
+          examples: data.exampleText ? [data.exampleText] : [],
+          questions,
+        };
+
+        setSection(formatted);
       } catch (err) {
-        console.error("Assessment fetch failed:", err);
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      console.log("Mapped questions:", questions);
+    fetchLesson();
+  }, [kcId, order]);
 
-      // 3️⃣ Combine everything
-      const formatted: ContentSection = {
-        id: data.kcId,
-        title: data.subtopicName,
-        videoUrl: data.videoUrl || '',
-        explanation: data.learningContent,
-        examples: data.exampleText ? [data.exampleText] : [],
-        questions, // ✅ NOW FILLED
-      };
+  // 🔥 Timer logic (only unlock hint, don't show it)
+  useEffect(() => {
+    setShowHint(false);
+    setHintUnlocked(false);
+    setTimer(0);
 
-      setSection(formatted);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+    let interval: NodeJS.Timeout;
+    const qNum = currentQuestionIndex + 1;
+
+    if (qNum >= 3) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          const newTime = prev + 1;
+
+          if ((qNum === 3 || qNum === 4) && newTime >= 10) {
+            setHintUnlocked(true);
+            clearInterval(interval);
+          }
+
+          if (qNum === 5 && newTime >= 20) {
+            setHintUnlocked(true);
+            clearInterval(interval);
+          }
+
+          return newTime;
+        });
+      }, 1000);
     }
-  };
 
-  fetchLesson();
-}, [kcId, order]);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [currentQuestionIndex]);
 
-  // 🔥 Loading states
   if (loading) {
     return <div className="p-10 text-center">Loading lesson...</div>;
   }
@@ -129,13 +152,11 @@ useEffect(() => {
   const handleAnswerSubmit = () => {
     if (!currentQuestion || selectedOption === null) return;
 
-    // ⚠️ No correctness check (backend hides answers)
-    onAnswer(true); // just mark attempt
+    onAnswer(true);
 
     if (currentQuestionIndex < section.questions.length - 1) {
       setCurrentQuestionIndex(i => i + 1);
       setSelectedOption(null);
-      setShowHint(false);
     } else {
       setIsFinished(true);
       setShowConfetti(true);
@@ -193,23 +214,6 @@ useEffect(() => {
           </motion.div>
         )}
 
-        {/* NO QUESTIONS */}
-        {step === 'assessment' && section.questions.length === 0 && (
-          <div className="text-center text-slate-500">
-            <p>No questions available yet.</p>
-            <button
-              onClick={() => {
-                setIsFinished(true);
-                setShowConfetti(true);
-                onComplete(kcId, order, score);
-              }}
-              className="mt-4 bg-green-600 text-white px-4 py-2 rounded"
-            >
-              Continue
-            </button>
-          </div>
-        )}
-
         {/* QUESTIONS */}
         {step === 'assessment' && section.questions.length > 0 && !isFinished && (
           <motion.div key="assessment">
@@ -229,6 +233,14 @@ useEffect(() => {
               ))}
             </div>
 
+            {/* Countdown */}
+            {(currentQuestionIndex + 1 >= 3) && !hintUnlocked && (
+              <p className="text-sm text-gray-500 mb-2">
+                Hint available in{" "}
+                {(currentQuestionIndex + 1 === 5 ? 20 : 10) - timer}s
+              </p>
+            )}
+
             <div className="flex gap-3">
               <button
                 onClick={handleAnswerSubmit}
@@ -237,12 +249,15 @@ useEffect(() => {
                 Submit
               </button>
 
-              <button
-                onClick={() => setShowHint(true)}
-                className="text-yellow-600"
-              >
-                Hint
-              </button>
+              {/* Hint button ONLY after unlock */}
+              {hintUnlocked && (
+                <button
+                  onClick={() => setShowHint(true)}
+                  className="text-yellow-600"
+                >
+                  Show Hint
+                </button>
+              )}
             </div>
 
             {showHint && currentQuestion.hint && (
