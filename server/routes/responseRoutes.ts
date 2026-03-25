@@ -13,6 +13,7 @@ router.post("/submit", authenticate, async (req, res) => {
   try {
     // 1. Fetch the actual question to check the correct answer
     const question = await Content.findById(questionId);
+    console.log("Question fetched for response submission:", questionId, question);
     if (!question) return res.status(404).json({ error: "Question not found" });
 
     const isCorrect = question.correctAnswer === selectedOption;

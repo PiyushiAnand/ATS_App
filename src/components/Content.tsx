@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
 
-// 🔥 Types
 interface Question {
+  _id: string;
   text: string;
   options: string[];
   hint?: string;
@@ -49,7 +49,13 @@ export const Content: React.FC<ContentProps> = ({
   const [isFinished, setIsFinished] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // 🔥 Fetch lesson + assessment
+  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
+
+  const [attemptCount, setAttemptCount] = useState(1);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  // FETCH LESSON
   useEffect(() => {
     const fetchLesson = async () => {
       try {
@@ -65,36 +71,32 @@ export const Content: React.FC<ContentProps> = ({
         let questions: Question[] = [];
 
         if (lessonId) {
-          try {
-            const assessRes = await fetch(`/api/assessments/lesson/${lessonId}`, {
-              credentials: 'include',
-            });
+          const assessRes = await fetch(`/api/assessments/lesson/${lessonId}`, {
+            credentials: 'include',
+          });
 
-            if (assessRes.ok) {
-              const assessData = await assessRes.json();
+          if (assessRes.ok) {
+            const assessData = await assessRes.json();
 
-              questions =
-                assessData?.questions?.slice(0, 5).map((q: any) => ({
-                  text: q.questionText,
-                  options: q.options || [],
-                  hint: q.hint,
-                })) || [];
-            }
-          } catch (err) {
-            console.error("Assessment fetch failed:", err);
+            questions =
+              assessData?.questions?.map((q: any) => ({
+                _id: q._id,
+                text: q.questionText,
+                options: q.options || [],
+                hint: q.hint,
+              })) || [];
           }
         }
 
-        const formatted: ContentSection = {
+        setSection({
           id: data.kcId,
           title: data.subtopicName,
           videoUrl: data.videoUrl || '',
           explanation: data.learningContent,
           examples: data.exampleText ? [data.exampleText] : [],
           questions,
-        };
+        });
 
-        setSection(formatted);
       } catch (err) {
         console.error(err);
       } finally {
@@ -105,9 +107,18 @@ export const Content: React.FC<ContentProps> = ({
     fetchLesson();
   }, [kcId, order]);
 
-  // 🔥 Timer logic (only unlock hint, don't show it)
+  // RESET PER QUESTION
   useEffect(() => {
+    setQuestionStartTime(Date.now());
+    setAttemptCount(1);
+    setIsCorrect(null);
+    setShowFeedback(false);
+    setSelectedOption(null);
     setShowHint(false);
+  }, [currentQuestionIndex]);
+
+  // TIMER (hint unlock)
+  useEffect(() => {
     setHintUnlocked(false);
     setTimer(0);
 
@@ -116,7 +127,7 @@ export const Content: React.FC<ContentProps> = ({
 
     if (qNum >= 3) {
       interval = setInterval(() => {
-        setTimer((prev) => {
+        setTimer(prev => {
           const newTime = prev + 1;
 
           if ((qNum === 3 || qNum === 4) && newTime >= 10) {
@@ -134,29 +145,58 @@ export const Content: React.FC<ContentProps> = ({
       }, 1000);
     }
 
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    return () => interval && clearInterval(interval);
   }, [currentQuestionIndex]);
 
-  if (loading) {
-    return <div className="p-10 text-center">Loading lesson...</div>;
-  }
-
-  if (!section) {
-    return <div className="p-10 text-center text-red-500">Failed to load lesson</div>;
-  }
+  if (loading) return <div className="p-10 text-center">Loading lesson...</div>;
+  if (!section) return <div className="p-10 text-center text-red-500">Failed</div>;
 
   const currentQuestion = section.questions[currentQuestionIndex];
 
-  const handleAnswerSubmit = () => {
+  // SUBMIT
+  const handleAnswerSubmit = async () => {
     if (!currentQuestion || selectedOption === null) return;
 
-    onAnswer(true);
+    const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
 
+    try {
+      const res = await fetch('/api/responses/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          attemptId: null,
+          questionId: currentQuestion._id,
+          kcId,
+          selectedOption: currentQuestion.options[selectedOption],
+          timeTaken,
+          hintCount: showHint ? 1 : 0,
+          attemptCount
+        })
+      });
+
+      const data = await res.json();
+
+      setIsCorrect(data.correct);
+      setShowFeedback(true);
+
+      if (data.correct) {
+        setScore(prev => prev + 1);
+        onAnswer(true);
+      } else {
+        setAttemptCount(prev => prev + 1);
+        onAnswer(false);
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // NEXT
+  const handleNext = () => {
     if (currentQuestionIndex < section.questions.length - 1) {
       setCurrentQuestionIndex(i => i + 1);
-      setSelectedOption(null);
     } else {
       setIsFinished(true);
       setShowConfetti(true);
@@ -174,47 +214,6 @@ export const Content: React.FC<ContentProps> = ({
 
       <AnimatePresence mode="wait">
 
-        {/* VIDEO */}
-        {step === 'video' && (
-          <motion.div key="video">
-            <h2 className="text-2xl font-bold mb-4">{section.title}</h2>
-
-            {section.videoUrl && (
-              <div className="aspect-video mb-4">
-                <iframe className="w-full h-full" src={section.videoUrl} allowFullScreen />
-              </div>
-            )}
-
-            <p className="mb-4">{section.explanation}</p>
-
-            <button
-              onClick={() => setStep('examples')}
-              className="bg-indigo-600 text-white px-4 py-2 rounded"
-            >
-              Next
-            </button>
-          </motion.div>
-        )}
-
-        {/* EXAMPLES */}
-        {step === 'examples' && (
-          <motion.div key="examples">
-            <h2 className="text-xl font-bold mb-4">Examples</h2>
-
-            {section.examples.map((ex, i) => (
-              <div key={i} className="mb-2">{ex}</div>
-            ))}
-
-            <button
-              onClick={() => setStep('assessment')}
-              className="bg-indigo-600 text-white px-4 py-2 rounded"
-            >
-              Start Assessment
-            </button>
-          </motion.div>
-        )}
-
-        {/* QUESTIONS */}
         {step === 'assessment' && section.questions.length > 0 && !isFinished && (
           <motion.div key="assessment">
             <p className="mb-4">{currentQuestion.text}</p>
@@ -223,9 +222,14 @@ export const Content: React.FC<ContentProps> = ({
               {currentQuestion.options.map((opt, i) => (
                 <button
                   key={i}
+                  disabled={isCorrect === true}
                   onClick={() => setSelectedOption(i)}
                   className={`block w-full text-left px-4 py-2 border rounded ${
-                    selectedOption === i ? 'bg-indigo-100 border-indigo-500' : ''
+                    selectedOption === i
+                      ? isCorrect
+                        ? 'bg-green-100 border-green-500'
+                        : 'bg-indigo-100 border-indigo-500'
+                      : ''
                   }`}
                 >
                   {opt}
@@ -233,24 +237,32 @@ export const Content: React.FC<ContentProps> = ({
               ))}
             </div>
 
-            {/* Countdown */}
             {(currentQuestionIndex + 1 >= 3) && !hintUnlocked && (
               <p className="text-sm text-gray-500 mb-2">
-                Hint available in{" "}
-                {(currentQuestionIndex + 1 === 5 ? 20 : 10) - timer}s
+                Hint in {(currentQuestionIndex + 1 === 5 ? 20 : 10) - timer}s
               </p>
             )}
 
             <div className="flex gap-3">
-              <button
-                onClick={handleAnswerSubmit}
-                className="bg-indigo-600 text-white px-4 py-2 rounded"
-              >
-                Submit
-              </button>
+              {!isCorrect && (
+                <button
+                  onClick={handleAnswerSubmit}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded"
+                >
+                  Submit
+                </button>
+              )}
 
-              {/* Hint button ONLY after unlock */}
-              {hintUnlocked && (
+              {isCorrect && (
+                <button
+                  onClick={handleNext}
+                  className="bg-green-600 text-white px-4 py-2 rounded"
+                >
+                  Next
+                </button>
+              )}
+
+              {hintUnlocked && !isCorrect && (
                 <button
                   onClick={() => setShowHint(true)}
                   className="text-yellow-600"
@@ -260,21 +272,25 @@ export const Content: React.FC<ContentProps> = ({
               )}
             </div>
 
+            {showFeedback && (
+              <div className="mt-4">
+                {isCorrect ? (
+                  <div className="text-green-600 text-lg">✅ Correct!</div>
+                ) : (
+                  <div className="text-red-500">❌ Incorrect, try again</div>
+                )}
+              </div>
+            )}
+
             {showHint && currentQuestion.hint && (
               <p className="mt-3 text-yellow-600">{currentQuestion.hint}</p>
             )}
           </motion.div>
         )}
 
-        {/* FINISHED */}
         {isFinished && (
           <motion.div key="finished" className="text-center">
             <h2 className="text-2xl font-bold mb-2">Completed!</h2>
-
-            <p className="mb-4">
-              You attempted all questions 🎉
-            </p>
-
             <button
               onClick={() => onComplete(kcId, order, score)}
               className="bg-green-600 text-white px-4 py-2 rounded"
@@ -283,6 +299,7 @@ export const Content: React.FC<ContentProps> = ({
             </button>
           </motion.div>
         )}
+
       </AnimatePresence>
     </div>
   );
