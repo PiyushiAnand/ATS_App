@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "./server/db/mongoose";
 import * as dotenv from "dotenv";
 import { Assessment } from "./server/models/Assessment"; 
 import { Lesson } from "./server/models/Lesson"; 

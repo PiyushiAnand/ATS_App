@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "../db/mongoose";
 
 const lessonSchema = new mongoose.Schema({
   kcId: { 
@@ -27,6 +27,27 @@ const lessonSchema = new mongoose.Schema({
   videoUrl: {
     type: String, // You mentioned using animations/videos for things like Drawing a Pie Chart
     default: null
+  },
+  // =========================
+  // 🎬 NEW: Animation Support
+  // =========================
+  animation: {
+    type: {
+      type: String,
+      enum: [
+        "tally-build",
+        "pictograph-scale",
+        "bar-grow",
+        "double-bar-compare"
+      ],
+      default: null
+    },
+
+    // Optional config for frontend control
+    config: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
+    }
   }
 }, { timestamps: true });
 

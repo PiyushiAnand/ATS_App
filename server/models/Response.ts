@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema, Model, Types } from "mongoose";
+import mongoose from "../db/mongoose";
+import { Document, Schema, Model, Types } from "mongoose";
 
 // 1. Define the TypeScript Interface for the Response Document
 export interface IResponse extends Document {

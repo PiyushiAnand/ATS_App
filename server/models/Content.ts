@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema, Model } from "mongoose";
+import mongoose from "../db/mongoose";
+import { Document, Schema, Model } from "mongoose";
 
 // 1. Define the TypeScript Interface for the Content Document
 export interface IContent extends Document {

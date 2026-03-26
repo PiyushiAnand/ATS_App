@@ -7,7 +7,7 @@ import { authenticate } from "../middleware/auth.ts";
 const router = express.Router();
 
 // Fetch the assessment details (and populated questions) for a specific lesson
-import mongoose from 'mongoose';
+import mongoose from '../db/mongoose';
 
 router.get("/lesson/:lessonId", authenticate, async (req, res) => {
   try {

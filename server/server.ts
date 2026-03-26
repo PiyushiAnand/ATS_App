@@ -1,7 +1,7 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import mongoose from "mongoose";
+import mongoose from "./db/mongoose";
 import dotenv from "dotenv";
 import app from "./app";
 
