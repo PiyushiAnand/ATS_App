@@ -7,6 +7,25 @@ export interface IContent extends Document {
   difficulty: "Easy" | "Medium" | "Hard";
   questionText: string;
   mediaUrl?: string | null;
+  animation: {
+      type: {
+        type: String,
+        enum: [
+          "tally-build",
+          "pictograph-scale",
+          "bar-grow",
+          "double-bar-compare",
+          "pie-chart"
+        ],
+        default: null
+      },
+  
+      // Optional config for frontend control
+      config: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+      }
+    },
   options: string[];
   correctAnswer: string;
   hint?: {

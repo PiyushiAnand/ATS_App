@@ -38,7 +38,8 @@ const lessonSchema = new mongoose.Schema({
         "tally-build",
         "pictograph-scale",
         "bar-grow",
-        "double-bar-compare"
+        "double-bar-compare",
+        "pie-chart"
       ],
       default: null
     },

@@ -8,6 +8,19 @@ const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://piyushianand2128_db_
 
 console.log("Using URI:", MONGO_URI);
 
+const getEmbedUrl = (url) => {
+  if (!url) return '';
+  if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1].split('?')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (url.includes('youtube.com/watch')) {
+    const urlObj = new URL(url);
+    const videoId = urlObj.searchParams.get('v');
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return url; 
+};
 const lessonsData = [
   // --- KC2: Pie Charts ---
   {
@@ -17,7 +30,17 @@ const lessonsData = [
     learningContent: "In a pie chart, we show data as parts of a whole. First, we convert the data into a fraction (part/total). Then, we change the fraction into a percentage by multiplying by 100. Finally, we convert the percentage into an angle by multiplying by 360°. Each part of the circle is called a sector, and together they make the full circle (360°).",
     exampleText: "Imagine a class where 10 students like football, 5 like cricket, and 5 like basketball (total = 20). Football = 10/20 = 1/2 = 50% → 50% of 360° = 180°. This means half the pie chart will represent football!",
     mediaUrl: "https://cdn1.byjus.com/wp-content/uploads/2020/03/Pie-Chart.png",
-    videoUrl: "https://youtu.be/GjJdZaQrItg?si=xGjJhQYcLdMHY1Yo"
+    videoUrl: "https://youtu.be/GjJdZaQrItg?si=xGjJhQYcLdMHY1Yo",
+    animation: {
+      type: "pie-chart",
+      config: {
+        data: [
+          { label: "Football", value: 10, color: "#4f46e5" }, // Indigo
+          { label: "Cricket", value: 5, color: "#10b981" },   // Emerald
+          { label: "Basketball", value: 5, color: "#f59e0b" } // Amber
+        ]
+      }
+    }
   },
   {
     kcId: "KC2",
@@ -26,7 +49,17 @@ const lessonsData = [
     learningContent: "To draw a pie chart, we first draw a circle using a compass. Then we mark the center and use a protractor to measure angles for each category. Starting from one line, we draw sectors one by one using the calculated angles. Each sector is then labeled and colored differently so that it is easy to understand.",
     exampleText: "If football has 180°, cricket has 90°, and basketball has 90°, you draw a circle, mark the center, and use a protractor to draw these angles step by step. Finally, color each part differently and add labels.",
     mediaUrl: "https://www.mathsisfun.com/data/images/pie-chart-1.svg",
-    videoUrl: "https://youtu.be/bqCSVof0e_k?si=ojf19LVqC1qGfNI3"
+    videoUrl: "https://youtu.be/bqCSVof0e_k?si=ojf19LVqC1qGfNI3",
+    animation: {
+      type: "pie-chart",
+      config: {
+        data: [
+          { label: "Football (180°)", value: 180, color: "#e11d48" }, // Rose
+          { label: "Cricket (90°)", value: 90, color: "#0ea5e9" },    // Sky Blue
+          { label: "Basketball (90°)", value: 90, color: "#8b5cf6" }  // Violet
+        ]
+      }
+    }
   },
   {
     kcId: "KC2",
@@ -35,7 +68,16 @@ const lessonsData = [
     learningContent: "Pie charts can help us solve real-life problems. We can find missing values, convert angles back into data, and compare different categories easily. If we know the angle, we can find the fraction by dividing by 360°. Then we can calculate the actual values.",
     exampleText: "If a sector is 90°, then it represents 90/360 = 1/4 of the total. If total students = 40, then 1/4 of 40 = 10 students. So that sector represents 10 students.",
     mediaUrl: "https://cdn.kastatic.org/ka-perseus-images/2c9c8c3c6f1a2c9c1f6c7a9a0c4c8c3d2f4d5a6b.png",
-    videoUrl: "https://youtu.be/lcKeZ0BJoT0?si=tQ_DLybUvTPKZShD"
+    videoUrl: "https://youtu.be/lcKeZ0BJoT0?si=tQ_DLybUvTPKZShD",
+    animation: {
+      type: "pie-chart",
+      config: {
+        data: [
+          { label: "Target Sector (10 students)", value: 10, color: "#10b981" }, // Highlighted in green
+          { label: "Other Students (30)", value: 30, color: "#cbd5e1" }          // Greyed out for contrast
+        ]
+      }
+    }
   },
 
   // --- KC3: Basic Probability & Random Experiments ---
@@ -101,11 +143,15 @@ const seedLessons = async () => {
     await mongoose.connect(MONGO_URI);
     console.log("Connected successfully!");
 
+    const processedLessonsData = lessonsData.map(lesson => ({
+      ...lesson,
+      videoUrl: getEmbedUrl(lesson.videoUrl)
+    }));
     console.log("Clearing old KC2 and KC3 lessons data...");
     await Lesson.deleteMany({ kcId: { $in: ["KC2", "KC3"] } });
 
     console.log("Seeding new lessons...");
-    await Lesson.insertMany(lessonsData);
+    await Lesson.insertMany(processedLessonsData);
 
     console.log("✅ KC2 and KC3 Lessons seeded successfully!");
     process.exit(0);

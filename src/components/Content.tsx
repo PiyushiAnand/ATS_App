@@ -279,6 +279,121 @@ const DoubleBarGraphAnimation = ({ data }: { data?: BarItem[] }) => {
     </div>
   );
 };
+
+
+interface PieItem {
+  label: string;
+  value: number;
+  color?: string;
+}
+
+const PieChartAnimation = ({ data }: { data?: PieItem[] }) => {
+  // Default data if none is provided in the config
+  const defaultData: PieItem[] = [
+    { label: "Cricket", value: 45 },
+    { label: "Football", value: 30 },
+    { label: "Tennis", value: 15 },
+    { label: "Basketball", value: 10 },
+  ];
+
+  const chartData = data && data.length > 0 ? data : defaultData;
+  const total = chartData.reduce((sum, item) => sum + item.value, 0);
+
+  // Default vibrant colors matching your Tailwind palette
+  const colors = ["#4f46e5", "#e11d48", "#10b981", "#f59e0b", "#0ea5e9", "#8b5cf6"];
+
+  // Helper function to draw the SVG wedge paths
+  const createWedge = (startAngle: number, endAngle: number, radius: number) => {
+    // Convert degrees to radians and offset by -90 so the first slice starts at the top (12 o'clock)
+    const start = (startAngle - 90) * (Math.PI / 180);
+    const end = (endAngle - 90) * (Math.PI / 180);
+
+    // Center point of the SVG
+    const cx = 100;
+    const cy = 100;
+
+    const x1 = cx + radius * Math.cos(start);
+    const y1 = cy + radius * Math.sin(start);
+    const x2 = cx + radius * Math.cos(end);
+    const y2 = cy + radius * Math.sin(end);
+
+    const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
+
+    // SVG Path: Move to center -> Line to arc start -> Arc -> Close path
+    return `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+  };
+
+  let currentAngle = 0;
+
+  return (
+    <div className="p-6 bg-slate-50 border rounded-xl mt-4 shadow-sm flex flex-col md:flex-row items-center gap-8">
+      <div className="flex-1">
+        <h3 className="font-semibold text-slate-700 mb-4">Data Distribution</h3>
+        
+        {/* Legend */}
+        <motion.div 
+          className="flex flex-col gap-2"
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.1 } } }}
+        >
+          {chartData.map((item, i) => (
+            <motion.div 
+              key={`legend-${i}`} 
+              className="flex items-center gap-2"
+              variants={{
+                hidden: { opacity: 0, x: -10 },
+                show: { opacity: 1, x: 0 }
+              }}
+            >
+              <div 
+                className="w-4 h-4 rounded-sm" 
+                style={{ backgroundColor: item.color || colors[i % colors.length] }} 
+              />
+              <span className="text-sm font-medium text-slate-600">
+                {item.label} ({Math.round((item.value / total) * 100)}%)
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* SVG Pie Chart */}
+      <div className="relative w-48 h-48 drop-shadow-md">
+        <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
+          {chartData.map((item, i) => {
+            const sliceAngle = (item.value / total) * 360;
+            const startAngle = currentAngle;
+            const endAngle = currentAngle + sliceAngle;
+            currentAngle += sliceAngle; // Advance angle for next slice
+
+            return (
+              <motion.path
+                key={`slice-${i}`}
+                d={createWedge(startAngle, endAngle, 95)}
+                fill={item.color || colors[i % colors.length]}
+                stroke="#f8fafc" // Matches slate-50 background for a clean gap
+                strokeWidth="2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  duration: 0.5,
+                  delay: i * 0.15,
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 15
+                }}
+                // Transform origin must be the center of the viewBox to scale correctly
+                style={{ transformOrigin: "100px 100px" }}
+                whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+              />
+            );
+          })}
+        </svg>
+      </div>
+    </div>
+  );
+};
 /* =========================
    🎬 ANIMATION RENDERER
 ========================= */
@@ -292,6 +407,8 @@ const AnimationRenderer = ({ type, config }: { type: string; config?: any }) => 
       return <BarGraphAnimation data={config?.data} />;
     case "double-bar-compare":
       return <DoubleBarGraphAnimation data={config?.data} />;
+    case "pie-chart": // ✅ Add this case!
+      return <PieChartAnimation data={config?.data} />;
     default:
       return null;
   }
