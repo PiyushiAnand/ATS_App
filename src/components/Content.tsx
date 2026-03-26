@@ -507,41 +507,43 @@ const PieDrawingAnimation = ({ config }: any) => {
    📈 CHANCE SCALE
 ========================= */
 const ChanceScaleAnimation = ({ config }: any) => {
+  const scale = config.scale || config.points || [];
+
   return (
-    <div className="flex justify-between px-4 py-6">
-      {config.points.map((p: any, i: number) => (
-        <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.3 }}>
-          <div className="text-xs text-center">{p.label}</div>
+    <div className="flex justify-between px-4 py-6 items-end">
+      {scale.map((p: any, i: number) => (
+        <motion.div
+          key={i}
+          className="flex flex-col items-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: i * 0.2 }}
+        >
+          <div className="text-xs">{p.label}</div>
+
+          {config.highlightIndex === i && (
+            <div className="text-red-500 text-lg">▲</div>
+          )}
         </motion.div>
       ))}
     </div>
   );
 };
-
 /* =========================
    🪙 COIN FLIP
 ========================= */
 const CoinFlipAnimation = ({ config }: any) => {
-  const [side, setSide] = useState("H");
-
   return (
     <div className="text-center">
-      <motion.div
-        key={side}
-        initial={{ rotateY: 0 }}
-        animate={{ rotateY: 180 }}
-        transition={{ duration: 0.6 }}
-        className="text-4xl"
-      >
-        {side}
-      </motion.div>
+      {config.sequence && (
+        <div className="mb-3 text-lg">
+          {config.sequence.join(" ")}
+        </div>
+      )}
 
-      <button
-        onClick={() => setSide(side === "H" ? "T" : "H")}
-        className="mt-2 text-sm text-indigo-600"
-      >
-        Flip
-      </button>
+      <div className="text-xl">
+        Next: H (1/2) or T (1/2)
+      </div>
     </div>
   );
 };
@@ -551,16 +553,21 @@ const CoinFlipAnimation = ({ config }: any) => {
 ========================= */
 const EqualOutcomesAnimation = ({ config }: any) => {
   return (
-    <div className="flex gap-4 justify-center">
+    <div className="flex gap-6 justify-center">
       {config.items.map((item: any, i: number) => (
-        <motion.div
-          key={i}
-          className="p-4 border rounded-lg"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-        >
-          {item.label}
-        </motion.div>
+        <div key={i} className="text-center">
+          <div className="flex gap-1 justify-center mb-2">
+            {Array.from({ length: item.count }).map((_, j) => (
+              <div
+                key={j}
+                className="w-4 h-4 rounded-full"
+                style={{ background: item.color }}
+              />
+            ))}
+          </div>
+          <div className="text-sm">{item.label}</div>
+          <div className="text-xs">{item.count}</div>
+        </div>
       ))}
     </div>
   );
@@ -571,10 +578,23 @@ const EqualOutcomesAnimation = ({ config }: any) => {
 ========================= */
 const ProbabilityFractionAnimation = ({ config }: any) => {
   return (
-    <div className="text-center text-2xl font-bold">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        {config.numerator} / {config.denominator}
-      </motion.div>
+    <div className="text-center">
+      <div className="flex justify-center gap-2 mb-4">
+        {config.sampleSpace.map((n: number) => (
+          <div
+            key={n}
+            className={`p-2 border ${
+              config.event.outcomes.includes(n) ? "bg-green-200" : ""
+            }`}
+          >
+            {n}
+          </div>
+        ))}
+      </div>
+
+      <div className="text-xl font-bold">
+        {config.fraction.numerator} / {config.fraction.denominator}
+      </div>
     </div>
   );
 };
@@ -585,11 +605,13 @@ const ProbabilityFractionAnimation = ({ config }: any) => {
 const EventHighlightAnimation = ({ config }: any) => {
   return (
     <div className="flex gap-2 justify-center">
-      {config.sampleSpace.map((n: number, i: number) => (
+      {config.sampleSpace.map((n: number) => (
         <div
-          key={i}
+          key={n}
           className={`p-2 border rounded ${
-            config.highlight.includes(n) ? "bg-green-200" : ""
+            config.event.outcomes.includes(n)
+              ? "bg-green-300"
+              : "opacity-40"
           }`}
         >
           {n}
@@ -598,19 +620,36 @@ const EventHighlightAnimation = ({ config }: any) => {
     </div>
   );
 };
-
 /* =========================
    🔁 COMPLEMENTARY PROBABILITY
 ========================= */
 const ComplementaryProbabilityAnimation = ({ config }: any) => {
   return (
     <div className="text-center">
-      <div>Happening: {config.happening}</div>
-      <div>Not Happening: {config.notHappening}</div>
+      <div className="w-full h-6 bg-gray-200 rounded overflow-hidden flex">
+        <div
+          style={{ width: `${config.event.probability * 100}%` }}
+          className="bg-blue-500"
+        />
+        <div
+          style={{ width: `${config.complement.probability * 100}%` }}
+          className="bg-yellow-400"
+        />
+      </div>
+
+      <div className="mt-2 text-sm">
+        {config.event.label}: {config.event.probability}
+      </div>
+      <div className="text-sm">
+        {config.complement.label}: {config.complement.probability}
+      </div>
+
+      <div className="mt-2 font-bold">
+        1 - {config.event.probability} = {config.complement.probability}
+      </div>
     </div>
   );
 };
-
 
 /* =========================
    🎬 ANIMATION RENDERER
@@ -746,7 +785,7 @@ export const Content: React.FC<ContentProps> = ({
 
         const data = await res.json();
         const lessonId = data._id;
-
+        console.log(data);
         let questions: Question[] = [];
         if (lessonId) {
           const assessRes = await fetch(`/api/assessments/lesson/${lessonId}`, {

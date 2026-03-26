@@ -31,16 +31,19 @@ const lessonsData = [
     exampleText: "Imagine a class where 10 students like football, 5 like cricket, and 5 like basketball (total = 20). Football = 10/20 = 1/2 = 50% → 50% of 360° = 180°. This means half the pie chart will represent football!",
     mediaUrl: "https://cdn1.byjus.com/wp-content/uploads/2020/03/Pie-Chart.png",
     videoUrl: "https://youtu.be/GjJdZaQrItg?si=xGjJhQYcLdMHY1Yo",
-    animation: {
-      type: "pie-chart",
-      config: {
-        data: [
-          { label: "Football", value: 10, color: "#4f46e5" }, // Indigo
-          { label: "Cricket", value: 5, color: "#10b981" },   // Emerald
-          { label: "Basketball", value: 5, color: "#f59e0b" } // Amber
-        ]
-      }
+   animation: {
+  type: "pie-chart",
+  config: {
+    data: [
+      { label: "Football", value: 10, color: "#4f46e5" },
+      { label: "Cricket", value: 5, color: "#10b981" },
+      { label: "Basketball", value: 5, color: "#f59e0b" }
+    ],
+    options: {
+      showLabels: true
     }
+  }
+}
   },
   {
   kcId: "KC2",
@@ -51,7 +54,7 @@ const lessonsData = [
   mediaUrl: "https://www.mathsisfun.com/data/images/pie-chart-1.svg",
   videoUrl: "https://youtu.be/t4aAOzSNabI?si=fRj4p9VQOwpWq94S&t=1",
 
-  animation: {
+ animation: {
   type: "pie-drawing",
   config: {
     data: [
@@ -59,20 +62,26 @@ const lessonsData = [
       { label: "Cricket", value: 25, color: "#0ea5e9" },
       { label: "Basketball", value: 25, color: "#8b5cf6" }
     ],
+
     steps: [
       { type: "circle" },
       { type: "center-point" },
-      { type: "radius", angle: 0 },
+      { type: "radius" },
+
       { type: "sector", index: 0 },
       { type: "sector", index: 1 },
       { type: "sector", index: 2 },
+
       { type: "labels" }
     ],
+
     options: {
-      stepDuration: 1000
-        }
-      }
+      animateSequentially: true,
+      stepDuration: 1200,
+      showAngles: true
     }
+  }
+}
   },
   {
     kcId: "KC2",
@@ -83,14 +92,17 @@ const lessonsData = [
     mediaUrl: "https://cdn.kastatic.org/ka-perseus-images/2c9c8c3c6f1a2c9c1f6c7a9a0c4c8c3d2f4d5a6b.png",
     videoUrl: "https://youtu.be/SdON8PfHoDc?si=MPu_ftCtmMzorKVx&t=3",
     animation: {
-      type: "pie-chart",
-      config: {
-        data: [
-          { label: "Target Sector (10 students)", value: 10, color: "#10b981" }, // Highlighted in green
-          { label: "Other Students (30)", value: 30, color: "#cbd5e1" }          // Greyed out for contrast
-        ]
-      }
+  type: "pie-chart",
+  config: {
+    data: [
+      { label: "Target Sector (10 students)", value: 10, color: "#10b981" },
+      { label: "Other Students (30)", value: 30, color: "#cbd5e1" }
+    ],
+    options: {
+      highlightIndex: 0
     }
+  }
+}
   },
 
   // --- KC3: Basic Probability & Random Experiments ---
@@ -102,18 +114,21 @@ const lessonsData = [
     exampleText: "Priya carries her umbrella every day, but it doesn’t rain. One day she forgets it, and it rains heavily! This shows how chance works in real life.",
     mediaUrl: "https://www.mathsisfun.com/data/images/probability-scale.png",
     videoUrl: "https://youtu.be/7XuNVVlD98g?si=s8eK6kYOcLO3YGl5",
-    animation: {
-      type: "chance-scale",
-      config: {
-        points: [
-          { label: "Impossible", value: 0 },
-          { label: "Unlikely", value: 0.25 },
-          { label: "Even Chance", value: 0.5 },
-          { label: "Likely", value: 0.75 },
-          { label: "Certain", value: 1 }
-        ]
-      }
+   animation: {
+  type: "chance-scale",
+  config: {
+    points: [
+      { label: "Impossible", value: 0 },
+      { label: "Unlikely", value: 0.25 },
+      { label: "Even Chance", value: 0.5 },
+      { label: "Likely", value: 0.75 },
+      { label: "Certain", value: 1 }
+    ],
+    options: {
+      showValues: true
     }
+  }
+}
   },
   {
     kcId: "KC3",
@@ -124,11 +139,13 @@ const lessonsData = [
     mediaUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Dice.jpg",
     videoUrl: "https://youtu.be/v6gZ5LiEouQ?si=xfbK4mjifs_VSysZ",
     animation: {
-      type: "coin-flip",
-      config: {
-        outcomes: ["H", "T"]
-      }
-    }
+  type: "coin-flip",
+  config: {
+    initial: "H",
+    states: ["H", "T"],
+    interactive: true
+  }
+}
   },
   {
     kcId: "KC3",
@@ -138,15 +155,18 @@ const lessonsData = [
     exampleText: "In a fair coin toss, getting Head or Tail has the same chance. So both outcomes are equally likely.",
     mediaUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1f/Coins.jpg",
     videoUrl: "https://youtu.be/eHJ40sSkYLE?si=kklnZVpU95F3PZgo&t=1",
-    animation: {
-      type: "equal-outcomes",
-      config: {
-        items: [
-          { label: "Head" },
-          { label: "Tail" }
-        ]
-      }
+ animation: {
+  type: "equal-outcomes",
+  config: {
+    items: [
+      { label: "Head" },
+      { label: "Tail" }
+    ],
+    options: {
+      equal: true
     }
+  }
+}
   },
   {
     kcId: "KC3",
@@ -156,13 +176,6 @@ const lessonsData = [
     exampleText: "For a coin toss, P(Head) = 1/2. For a die, P(getting 3) = 1/6. This means getting a 3 is less likely than getting either Head or Tail in a coin toss.",
     mediaUrl: "https://cdn1.byjus.com/wp-content/uploads/2020/02/Probability.png",
     videoUrl: "https://youtu.be/lYXDQ5-I7Qk?si=pqBMPfE-FdviMOn7",
-    animation: {
-      type: "probability-fraction",
-      config: {
-        numerator: 1,
-        denominator: 2
-      }
-    }
   },
   {
     kcId: "KC3",
@@ -172,13 +185,7 @@ const lessonsData = [
     exampleText: "When rolling a die, the event 'getting an even number' includes outcomes {2, 4, 6}. So, probability = 3/6 = 1/2.",
     mediaUrl: "https://www.onlinemathlearning.com/image-files/probability-events.png",
     videoUrl: "https://youtu.be/LS-_ihDKr2M?si=0OtYuW8ADX6FSbyQ&t=2",
-    animation: {
-      type: "event-highlight",
-      config: {
-        sampleSpace: [1, 2, 3, 4, 5, 6],
-        highlight: [2, 4, 6]
-      }
-    }
+   
   },
   {
     kcId: "KC3",
@@ -188,13 +195,7 @@ const lessonsData = [
     exampleText: "If the chance of rain is 1/10, then the chance of no rain is 9/10. This helps us make decisions like carrying an umbrella.",
     mediaUrl: "https://cdn1.byjus.com/wp-content/uploads/2020/02/Probability-Examples.png",
     videoUrl: "https://youtu.be/Gpvddf7QAm4?si=fbNNYcglt08FDgOY",
-    animation: {
-      type: "complementary-probability",
-      config: {
-        happening: 0.1,
-        notHappening: 0.9
-      }
-    }
+  
   }
 ];
 
