@@ -7,7 +7,7 @@ import { seedRemedial } from '../data/seedRemedial';
 /* =========================
    🎬 SIMPLE ANIMATION COMPONENTS
 ========================= */
-const TallyAnimation = ({ count = 12 }: { count?: number }) => {
+const TallyAnimation = ({ count = 12 }: { count?: number}) => {
   const fullGroups = Math.floor(count / 5);
   const remainder = count % 5;
 
@@ -27,7 +27,6 @@ const TallyAnimation = ({ count = 12 }: { count?: number }) => {
 
   return (
     <div className="p-6 bg-slate-50 border rounded-xl mt-4 shadow-sm">
-      <h3 className="font-semibold text-slate-700 mb-3">Tally Count: {count}</h3>
       <motion.div
         className="flex flex-wrap gap-6"
         variants={container}
