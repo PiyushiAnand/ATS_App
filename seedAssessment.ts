@@ -8,7 +8,7 @@ dotenv.config();
 
 const MONGO_URI = "mongodb+srv://piyushianand2128_db_user:cjdjLvrJMDDFMiKB@cluster0.074ksss.mongodb.net/?appName=Cluster0";
 
-// All KC1 Questions extracted precisely from ET605 Project.pdf
+// All KC1 Questions extracted precisely from ET605 Project.pdf with Animations!
 const kc1Assessments = [
   {
     order: 1,
@@ -31,7 +31,9 @@ const kc1Assessments = [
         questionText: "If a tally mark represents the number of mangoes sold, and you see two full bundles of 5 and three single lines, how many mangoes were sold?",
         options: ["10", "12", "13", "15"],
         correctAnswer: "13",
-        hint: { text: "Each bundled block counts as 5, and each single line counts as 1.", unlockTime: 10 }
+        hint: { text: "Each bundled block counts as 5, and each single line counts as 1.", unlockTime: 10 },
+        // ✅ Added Tally Animation showing exactly 13!
+        animation: { type: "tally-build", config: { count: 13 } } 
       },
       {
         difficulty: "Medium",
@@ -45,7 +47,9 @@ const kc1Assessments = [
         questionText: "A fruit seller has 30 apples. He sells some and represents the remaining apples using tally marks as three bundles of 5 and two single lines (17). How many apples did he sell?",
         options: ["17", "13", "15", "30"],
         correctAnswer: "13",
-        hint: { text: "First, calculate the number of apples remaining from the tally marks (5+5+5+2), then subtract that from the total 30.", unlockTime: 20 }
+        hint: { text: "First, calculate the number of apples remaining from the tally marks (5+5+5+2), then subtract that from the total 30.", unlockTime: 20 },
+        // ✅ Added Tally Animation showing the 17 remaining apples
+        animation: { type: "tally-build", config: { count: 17 } }
       }
     ]
   },
@@ -70,14 +74,18 @@ const kc1Assessments = [
         questionText: "A pictograph shows 5 symbols of a 'Book' for a library's collection. If the scale is 1 Book symbol = 20 books, how many total books are there?",
         options: ["5", "20", "100", "50"],
         correctAnswer: "100",
-        hint: { text: "Multiply the number of symbols by the value of one symbol.", unlockTime: 10 }
+        hint: { text: "Multiply the number of symbols by the value of one symbol.", unlockTime: 10 },
+        // ✅ Added Pictograph Animation with book emojis
+        animation: { type: "pictograph-scale", config: { count: 5, icon: "📚" } }
       },
       {
         difficulty: "Medium",
         questionText: "In a pictograph about village electricity, 4 bulbs represent 40 houses with power. What is the scale of the pictograph?",
         options: ["1 bulb = 4 houses", "1 bulb = 10 houses", "1 bulb = 40 houses", "1 bulb = 1 house"],
         correctAnswer: "1 bulb = 10 houses",
-        hint: { text: "Divide the total number of houses by the number of symbols shown.", unlockTime: 10 }
+        hint: { text: "Divide the total number of houses by the number of symbols shown.", unlockTime: 10 },
+        // ✅ Added Pictograph Animation with lightbulb emojis
+        animation: { type: "pictograph-scale", config: { count: 4, icon: "💡" } }
       },
       {
         difficulty: "Hard",
@@ -109,14 +117,18 @@ const kc1Assessments = [
         questionText: "If the scale is 1 unit = 5 students, how tall should the bar be for a class of 35 students?",
         options: ["5 units", "35 units", "7 units", "10 units"],
         correctAnswer: "7 units",
-        hint: { text: "Divide the total value (35) by the value of one unit (5).", unlockTime: 10 }
+        hint: { text: "Divide the total value (35) by the value of one unit (5).", unlockTime: 10 },
+        // ✅ Added Bar Graph Animation showing the heights
+        animation: { type: "bar-grow", config: { data: [{ label: "Class A", value: 35 }, { label: "Class B", value: 20 }] } }
       },
       {
         difficulty: "Medium",
         questionText: "On a bar graph showing rainfall in Mumbai, the bar for July is 15 units tall (Scale: 1 unit = 10 mm). How much rain fell in July?",
         options: ["15 mm", "150 mm", "100 mm", "25 mm"],
         correctAnswer: "150 mm",
-        hint: { text: "Multiply the height of the bar by the scale.", unlockTime: 10 }
+        hint: { text: "Multiply the height of the bar by the scale.", unlockTime: 10 },
+        // ✅ Added Bar Graph Animation visualizing the 15 units
+        animation: { type: "bar-grow", config: { data: [{ label: "June", value: 8 }, { label: "July", value: 15 }] } }
       },
       {
         difficulty: "Hard",
@@ -148,14 +160,18 @@ const kc1Assessments = [
         questionText: "A double bar graph compares the sale of 'Cold Drinks' and 'Tea' in a shop. If the 'Tea' bar is much higher than the 'Cold Drink' bar in January, what does it suggest?",
         options: ["More cold drinks were sold.", "More tea was sold.", "No tea was sold.", "The shop was closed."],
         correctAnswer: "More tea was sold.",
-        hint: { text: "Taller bars indicate a higher quantity for that specific category.", unlockTime: 10 }
+        hint: { text: "Taller bars indicate a higher quantity for that specific category.", unlockTime: 10 },
+        // ✅ Added Double Bar Chart Animation comparing Tea and Cold Drinks
+        animation: { type: "double-bar-compare", config: { data: [{ label: "January", value: 30, valueB: 90 }] } }
       },
       {
         difficulty: "Medium",
-        questionText: "Looking at a double bar graph of marks, Student A has bars of 60 and 80 in Maths. What is the increase in their marks?",
+        questionText: "Looking at a double bar graph of marks, what is the increase in their marks?",
         options: ["140 marks", "20 marks", "80 marks", "No increase"],
         correctAnswer: "20 marks",
-        hint: { text: "Subtract the value of the first bar from the value of the second bar.", unlockTime: 10 }
+        hint: { text: "Subtract the value of the first bar from the value of the second bar.", unlockTime: 10 },
+        // ✅ Added Double Bar Chart Animation showing the score jump
+        animation: { type: "double-bar-compare", config: { data: [{ label: "Maths", value: 60, valueB: 80 }] } }
       },
       {
         difficulty: "Hard",

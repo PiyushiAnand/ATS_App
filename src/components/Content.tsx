@@ -422,6 +422,10 @@ interface Question {
   text: string;
   options: string[];
   hint?: string;
+  animation?: {
+    type: string;
+    config?: any;
+  };
 }
 
 interface ContentSection {
@@ -510,6 +514,7 @@ export const Content: React.FC<ContentProps> = ({
                 text: q.questionText,
                 options: q.options || [],
                 hint: q.hint?.text || "",
+                animation: q.animation || null,
               })) || [];
           }
         }
@@ -697,6 +702,15 @@ export const Content: React.FC<ContentProps> = ({
           <motion.div key="assessment">
             <p className="mb-4">{currentQuestion.text}</p>
 
+            {currentQuestion.animation?.type && (
+              <div className="mb-6 pointer-events-none"> 
+                {/* pointer-events-none ensures users don't accidentally interact with chart tooltips when trying to answer */}
+                <AnimationRenderer
+                  type={currentQuestion.animation.type}
+                  config={currentQuestion.animation.config}
+                />
+              </div>
+            )}
             <div className="space-y-2 mb-4">
               {currentQuestion.options.map((opt, i) => (
                 <button

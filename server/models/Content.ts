@@ -80,6 +80,25 @@ const contentSchema: Schema<IContent> = new mongoose.Schema(
       type: String,
       default: null, // Used for concept errors or repeated errors
     },
+    animation: {
+        type: {
+          type: String,
+          enum: [
+            "tally-build",
+            "pictograph-scale",
+            "bar-grow",
+            "double-bar-compare",
+            "pie-chart"
+          ],
+          default: null
+        },
+    
+        // Optional config for frontend control
+        config: {
+          type: mongoose.Schema.Types.Mixed,
+          default: null
+        }
+      }
   },
   { 
     timestamps: true 
