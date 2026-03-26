@@ -14,7 +14,8 @@ router.get("/get_mastery", authenticate, async (req: AuthRequest, res: Response)
     }
 
     res.json({
-      mastery: user.mastery || {}
+      mastery: user.mastery || {},
+      completedTopics: user.completedTopics || []
     });
 
   } catch (err: any) {
