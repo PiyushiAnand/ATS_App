@@ -4,81 +4,101 @@ import { Lesson } from "./server/models/Lesson";
 const MONGO_URI = "mongodb+srv://piyushianand2128_db_user:cjdjLvrJMDDFMiKB@cluster0.074ksss.mongodb.net/?appName=Cluster0";
 
 console.log("Using URI:", MONGO_URI);
-
+const getEmbedUrl = (url) => {
+  if (!url) return '';
+  if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1].split('?')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (url.includes('youtube.com/watch')) {
+    const urlObj = new URL(url);
+    const videoId = urlObj.searchParams.get('v');
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return url; 
+};
 const lessonsData = [
-  // --- KC1: Data Representation and Interpretation ---
+  // --- KC1 ---
   {
     kcId: "KC1",
     subtopicName: "Subtopic 1: Introduction to Data and Organising Data",
     order: 1,
-    learningContent: "Information collected in various situations—such as runs made by a batsman in the last 10 test matches or marks scored by students in a Mathematics unit test—is called data. To draw meaningful inferences from any raw data, we need to organise it systematically.",
-    exampleText: "Example: To find the average height of students, a teacher writes down the heights of all the students in her class, organises the data in a systematic manner (like a frequency table), and then interprets it accordingly.",
-    mediaUrl: null, 
-    videoUrl: "https://www.youtube.com/embed/n2YkbdNORp8",
+    learningContent:
+      "Data means information that we collect. For example, marks of students, runs scored in a match, or favourite foods of friends. When data is messy, it is hard to understand. So, we organise it in a simple way. One easy method is using tally marks, where we count and group things in sets of 5.",
+    exampleText:
+      "Suppose you ask 20 classmates their favourite snack. Instead of writing a long list, you use tally marks. For every 'Samosa', you draw a line. When you reach 5, you draw a line across the previous 4 to make a group. This makes counting quick and easy!",
+    mediaUrl: null,
+    videoUrl: "https://youtu.be/zF_dBk8EPDk?si=qjSom_kHQPQ_-bTM",
     animation: {
       type: "tally-build",
       config: {
-        count: 24 // Can represent 24 heights or measurements to run a tally build
-      }
-    }
+        count: 20,
+      },
+    },
   },
+
   {
     kcId: "KC1",
     subtopicName: "Subtopic 2: Pictographs",
     order: 2,
-    learningContent: "A Pictograph is a pictorial representation of data using symbols. It gives a clear, visual idea of quantities at a single glance.",
-    exampleText: "Example: Tracking car production over months where one car symbol stands for 100 cars. If July shows 2 and a half symbols, it denotes 250 cars (since a half-symbol denotes half of 100).",
-    mediaUrl: null, 
-    videoUrl: null,
+    learningContent:
+      "A pictograph shows data using pictures or symbols. It helps us understand information quickly. Each picture stands for a fixed number. This number is called the scale.",
+    exampleText:
+      "Imagine a chart showing cars made in a factory. If 1 car picture means 100 cars, then 2 pictures mean 200 cars. If you see half a picture, it means 50 cars.",
+    mediaUrl: null,
+    videoUrl: "https://youtu.be/V4vijfX-3u0?si=wc8Iz7qGTw6dT5sq",
     animation: {
       type: "pictograph-scale",
       config: {
-        count: 3, // Represents 300 cars for August
-        icon: "🚗"
-      }
-    }
+        count: 3,
+        icon: "🚗",
+        scale: 100,
+      },
+    },
   },
+
   {
     kcId: "KC1",
     subtopicName: "Subtopic 3: Bar Graphs",
     order: 3,
-    learningContent: "A bar graph is a display of information using bars of uniform width, with their heights being proportional to the respective values they represent. The bars are drawn with equal gaps in between them.",
-    exampleText: "Example: Number of students in Class VIII over multiple academic years. The bar heights give the exact quantity for each category (Year).",
+    learningContent:
+      "A bar graph shows data using bars. Each bar represents a value, and taller bars mean bigger values. All bars have the same width and equal gaps between them.",
+    exampleText:
+      "Suppose a teacher records the number of students in different years. Each year is shown with a bar. The taller the bar, the more students there are in that year.",
     mediaUrl: null,
-    videoUrl: null,
+    videoUrl: "https://youtu.be/l8kR7ScrfQA?si=NAql5m_zFXhIue6p",
     animation: {
       type: "bar-grow",
       config: {
         data: [
-          { label: "2003-04", value: 100 },
-          { label: "2004-05", value: 200 },
-          { label: "2005-06", value: 250 },
-          { label: "2006-07", value: 300 },
-          { label: "2007-08", value: 350 }
-        ]
-      }
-    }
+          { label: "2021", value: 50 },
+          { label: "2022", value: 70 },
+          { label: "2023", value: 60 },
+        ],
+      },
+    },
   },
+
   {
     kcId: "KC1",
     subtopicName: "Subtopic 4: Double Bar Graphs",
     order: 4,
-    learningContent: "A Double Bar Graph is a bar graph showing two sets of data simultaneously. It is highly useful for direct comparisons of data patterns.",
-    exampleText: "Example: Comparing marks obtained by a student across different subjects between two academic years (e.g., 2005-06 vs 2006-07). It allows us to pinpoint where performance improved, deteriorated, or stayed at par.",
+    learningContent:
+      "A double bar graph is used to compare two sets of data. For each category, two bars are shown side by side. This helps us easily see the difference.",
+    exampleText:
+      "Suppose you compare your marks in Maths and Science for two years. For each subject, you draw two bars—one for last year and one for this year. This helps you see where you improved.",
     mediaUrl: null,
-    videoUrl: null,
+    videoUrl: "https://youtu.be/4UQAD3xTSLk?si=vuQVRDjZ6neSn5sk",
     animation: {
       type: "double-bar-compare",
       config: {
         data: [
           { label: "Maths", value: 30, valueB: 60 },
-          { label: "S.Science", value: 50, valueB: 55 },
-          { label: "Science", value: 45, valueB: 50 },
-          { label: "English", value: 50, valueB: 45 },
-          { label: "Hindi", value: 60, valueB: 60 }
-        ]
-      }
-    }
+          { label: "Science", value: 50, valueB: 55 },
+          { label: "English", value: 45, valueB: 50 },
+        ],
+      },
+    },
   },
 ];
 
@@ -92,9 +112,13 @@ const seedLessons = async () => {
     console.log("Mongoose connection state:", mongoose.connection.readyState);
     console.log("Model DB state:", Lesson.db.readyState);
     
+    const processedLessonsData = lessonsData.map(lesson => ({
+      ...lesson,
+      videoUrl: getEmbedUrl(lesson.videoUrl)
+    }));
     // Clear old seeded entries to avoid duplicate constraints if any exist
     await Lesson.deleteMany({ kcId: "KC1" });
-    await Lesson.insertMany(lessonsData);
+    await Lesson.insertMany(processedLessonsData);
 
     console.log("✅ Lessons seeded successfully with textbook-accurate animation configs!");
     process.exit(0);

@@ -541,14 +541,6 @@ export const Content: React.FC<ContentProps> = ({
 
             <p className="mb-4">{section.explanation}</p>
 
-            {/* 🎬 Animation */}
-            {section.animation?.type && (
-              <AnimationRenderer
-                type={section.animation.type}
-                config={section.animation.config}
-              />
-            )}
-
             <button
               onClick={() => setStep('examples')}
               className="bg-indigo-600 text-white px-4 py-2 rounded"
