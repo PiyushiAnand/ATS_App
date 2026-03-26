@@ -394,6 +394,225 @@ const PieChartAnimation = ({ data }: { data?: PieItem[] }) => {
     </div>
   );
 };
+
+/* =========================
+   🥧 PIE DRAWING
+========================= */
+const PieDrawingAnimation = ({ config }: any) => {
+  const { data, steps, options } = config;
+  const [stepIndex, setStepIndex] = React.useState(0);
+
+  const total = data.reduce((s: number, d: any) => s + d.value, 0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIndex((prev) => {
+        if (prev >= steps.length - 1) return prev;
+        return prev + 1;
+      });
+    }, options?.stepDuration || 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  let currentAngle = 0;
+
+  const drawSector = (d: any, start: number, end: number) => {
+    const startRad = (start - 90) * Math.PI / 180;
+    const endRad = (end - 90) * Math.PI / 180;
+
+    const x1 = 100 + 90 * Math.cos(startRad);
+    const y1 = 100 + 90 * Math.sin(startRad);
+    const x2 = 100 + 90 * Math.cos(endRad);
+    const y2 = 100 + 90 * Math.sin(endRad);
+
+    const largeArc = end - start > 180 ? 1 : 0;
+
+    return `M100 100 L${x1} ${y1} A90 90 0 ${largeArc} 1 ${x2} ${y2} Z`;
+  };
+
+  return (
+    <svg viewBox="0 0 200 200" className="w-56 h-56 mx-auto">
+
+      {/* STEP 1: Circle */}
+      {stepIndex >= 0 && (
+        <motion.circle
+          cx="100"
+          cy="100"
+          r="90"
+          stroke="black"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+        />
+      )}
+
+      {/* STEP 2: Center */}
+      {stepIndex >= 1 && (
+        <motion.circle
+          cx="100"
+          cy="100"
+          r="3"
+          fill="black"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+        />
+      )}
+
+      {/* STEP 3: Radius */}
+      {stepIndex >= 2 && (
+        <motion.line
+          x1="100"
+          y1="100"
+          x2="100"
+          y2="10"
+          stroke="black"
+          strokeWidth="2"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+        />
+      )}
+
+      {/* STEP 4+: Sectors */}
+      {data.map((d: any, i: number) => {
+        const angle = (d.value / total) * 360;
+        const start = currentAngle;
+        const end = currentAngle + angle;
+        currentAngle += angle;
+
+        if (stepIndex < 3 + i) return null;
+
+        return (
+          <motion.path
+            key={i}
+            d={drawSector(d, start, end)}
+            fill={d.color}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          />
+        );
+      })}
+
+      {/* LAST STEP: Labels */}
+      {stepIndex >= steps.length - 1 &&
+        data.map((d: any, i: number) => (
+          <text key={i} x="100" y={20 + i * 15} textAnchor="middle" fontSize="10">
+            {d.label}
+          </text>
+        ))}
+    </svg>
+  );
+};
+
+/* =========================
+   📈 CHANCE SCALE
+========================= */
+const ChanceScaleAnimation = ({ config }: any) => {
+  return (
+    <div className="flex justify-between px-4 py-6">
+      {config.points.map((p: any, i: number) => (
+        <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.3 }}>
+          <div className="text-xs text-center">{p.label}</div>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+/* =========================
+   🪙 COIN FLIP
+========================= */
+const CoinFlipAnimation = ({ config }: any) => {
+  const [side, setSide] = useState("H");
+
+  return (
+    <div className="text-center">
+      <motion.div
+        key={side}
+        initial={{ rotateY: 0 }}
+        animate={{ rotateY: 180 }}
+        transition={{ duration: 0.6 }}
+        className="text-4xl"
+      >
+        {side}
+      </motion.div>
+
+      <button
+        onClick={() => setSide(side === "H" ? "T" : "H")}
+        className="mt-2 text-sm text-indigo-600"
+      >
+        Flip
+      </button>
+    </div>
+  );
+};
+
+/* =========================
+   ⚖️ EQUAL OUTCOMES
+========================= */
+const EqualOutcomesAnimation = ({ config }: any) => {
+  return (
+    <div className="flex gap-4 justify-center">
+      {config.items.map((item: any, i: number) => (
+        <motion.div
+          key={i}
+          className="p-4 border rounded-lg"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+        >
+          {item.label}
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+/* =========================
+   🔢 PROBABILITY FRACTION
+========================= */
+const ProbabilityFractionAnimation = ({ config }: any) => {
+  return (
+    <div className="text-center text-2xl font-bold">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        {config.numerator} / {config.denominator}
+      </motion.div>
+    </div>
+  );
+};
+
+/* =========================
+   🎯 EVENT HIGHLIGHT
+========================= */
+const EventHighlightAnimation = ({ config }: any) => {
+  return (
+    <div className="flex gap-2 justify-center">
+      {config.sampleSpace.map((n: number, i: number) => (
+        <div
+          key={i}
+          className={`p-2 border rounded ${
+            config.highlight.includes(n) ? "bg-green-200" : ""
+          }`}
+        >
+          {n}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/* =========================
+   🔁 COMPLEMENTARY PROBABILITY
+========================= */
+const ComplementaryProbabilityAnimation = ({ config }: any) => {
+  return (
+    <div className="text-center">
+      <div>Happening: {config.happening}</div>
+      <div>Not Happening: {config.notHappening}</div>
+    </div>
+  );
+};
+
+
 /* =========================
    🎬 ANIMATION RENDERER
 ========================= */
@@ -401,18 +620,48 @@ const AnimationRenderer = ({ type, config }: { type: string; config?: any }) => 
   switch (type) {
     case "tally-build":
       return <TallyAnimation count={config?.count} />;
+
     case "pictograph-scale":
       return <PictographAnimation count={config?.count} icon={config?.icon} />;
+
     case "bar-grow":
       return <BarGraphAnimation data={config?.data} />;
+
     case "double-bar-compare":
       return <DoubleBarGraphAnimation data={config?.data} />;
-    case "pie-chart": // ✅ Add this case!
+
+    case "pie-chart":
       return <PieChartAnimation data={config?.data} />;
+
+    // ✅ NEW TYPES
+    case "pie-drawing":
+      return <PieDrawingAnimation config={config} />;
+
+    case "chance-scale":
+      return <ChanceScaleAnimation config={config} />;
+
+    case "coin-flip":
+      return <CoinFlipAnimation config={config} />;
+
+    case "equal-outcomes":
+      return <EqualOutcomesAnimation config={config} />;
+
+    case "probability-fraction":
+      return <ProbabilityFractionAnimation config={config} />;
+
+    case "event-highlight":
+      return <EventHighlightAnimation config={config} />;
+
+    case "complementary-probability":
+      return <ComplementaryProbabilityAnimation config={config} />;
+
     default:
       return null;
   }
 };
+
+
+
 
 /* =========================
    TYPES

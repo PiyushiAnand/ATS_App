@@ -39,7 +39,14 @@ const lessonSchema = new mongoose.Schema({
         "pictograph-scale",
         "bar-grow",
         "double-bar-compare",
-        "pie-chart"
+        "pie-chart",
+        "pie-drawing",
+        "chance-scale",
+        "coin-flip",
+        "equal-outcomes",
+        "probability-fraction",
+        "event-highlight",
+        "complementary-probability"
       ],
       default: null
     },

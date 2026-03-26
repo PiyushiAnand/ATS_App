@@ -15,7 +15,14 @@ export interface IContent extends Document {
           "pictograph-scale",
           "bar-grow",
           "double-bar-compare",
-          "pie-chart"
+          "pie-chart",
+          "pie-drawing",
+          "chance-scale",
+          "coin-flip",
+          "equal-outcomes",
+          "probability-fraction",
+          "event-highlight",
+          "complementary-probability"
         ],
         default: null
       },
@@ -88,7 +95,14 @@ const contentSchema: Schema<IContent> = new mongoose.Schema(
             "pictograph-scale",
             "bar-grow",
             "double-bar-compare",
-            "pie-chart"
+            "pie-chart",
+            "pie-drawing",
+            "chance-scale",
+            "coin-flip",
+            "equal-outcomes",
+            "probability-fraction",
+            "event-highlight",
+            "complementary-probability"
           ],
           default: null
         },
