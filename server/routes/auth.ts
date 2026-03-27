@@ -13,8 +13,9 @@ router.post("/signup", async (req, res) => {
     const user = new User({ name, email, password: hashedPassword });
     await user.save();
     const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-    res.cookie("token", token, { httpOnly: true, secure: true,       // 🔥 REQUIRED on HTTPS (Render)
+    res.cookie("token", token, { httpOnly: true, secure: true,      
    sameSite: "none",  
+   partitioned: true
    });
     res.json({ name: user.name, email: user.email, mastery: user.mastery, completedTopics: user.completedTopics });
   } catch (err: any) {
@@ -30,7 +31,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
     const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none" });
+    res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "none", partitioned: true });
     res.json({ name: user.name, email: user.email, mastery: user.mastery, completedTopics: user.completedTopics });
   } catch (err: any) {
     res.status(400).json({ error: err.message });

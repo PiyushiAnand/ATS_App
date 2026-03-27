@@ -26,6 +26,8 @@ async function startServer() {
     });
   });
 
+  // 🚀 Tell Express to trust Render's HTTPS proxy so secure cookies are allowed to pass!
+  app.set("trust proxy", 1);
   // 0.0.0.0 is required for Render to bind to the port
   app.listen(PORT as number, "0.0.0.0", () => {
     console.log(`🚀 Backend running on port ${PORT}`);

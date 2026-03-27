@@ -9,9 +9,10 @@ import assessmentRoutes from "./routes/assessmentRoutes";
 import responseRoutes from "./routes/responseRoutes";
 import masteryRoute from "./routes/masteryRoute";
 import cors from "cors";
+
 const app = express();
 
-
+app.set("trust proxy", 1);
 // Middleware
 app.use(morgan("dev"));
 app.use(express.json());
