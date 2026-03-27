@@ -1,45 +1,34 @@
 import express from "express";
-import { createServer as createViteServer } from "vite";
-import path from "path";
 import mongoose from "./db/mongoose";
 import dotenv from "dotenv";
-import app from "./app";
+import app from "./app"; // Your express app with your API routes
 
 dotenv.config();
 
+// Render sets process.env.PORT automatically (usually 10000)
+const PORT = process.env.PORT || 3000; 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/cognipath";
-const PORT = 3000;
 
 async function startServer() {
-  // Connect to MongoDB
   try {
     console.log("Connecting to MongoDB...");
-    console.log("Using URI:", MONGODB_URI); // Log the URI to verify it's correct
     await mongoose.connect(MONGODB_URI);
-
-
     console.log("Connected to MongoDB");
   } catch (err) {
     console.error("MongoDB connection error:", err);
   }
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
+  // Pure API Root Route
+  app.get("/", (req, res) => {
+    res.status(200).json({ 
+      message: "Backend API is running successfully!",
+      timestamp: new Date().toISOString()
     });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
-  }
+  });
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  // 0.0.0.0 is required for Render to bind to the port
+  app.listen(PORT as number, "0.0.0.0", () => {
+    console.log(`🚀 Backend running on port ${PORT}`);
   });
 }
 
