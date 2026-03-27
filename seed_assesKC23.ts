@@ -27,8 +27,6 @@ const kcAssessmentsData = [
       options: ["A straight line", "A slice representing a category", "The center point", "The radius"],
       correctAnswer: "A slice representing a category"
     },
-
-    // ✅ MEDIUM (slightly tougher + hint + animation)
     {
       difficulty: "Medium",
       questionText: "A class has 40 students. 15 like chocolate cake. What fraction represents this?",
@@ -45,7 +43,6 @@ const kcAssessmentsData = [
         }
       }
     },
-
     {
       difficulty: "Medium",
       questionText: "Convert 12.5% into an angle for a pie chart.",
@@ -53,8 +50,6 @@ const kcAssessmentsData = [
       correctAnswer: "45°",
       hint: { text: "Angle = % × 360 → 12.5% = 12.5/100.", unlockTime: 10 }
     },
-
-    // ✅ HARD (more multi-step)
     {
       difficulty: "Hard",
       questionText: "A pie chart sector is 108°. If total students are 200, how many students does it represent?",
@@ -73,7 +68,6 @@ const kcAssessmentsData = [
     }
   ]
 },
-
 {
   kcId: "KC2",
   order: 2,
@@ -91,8 +85,6 @@ const kcAssessmentsData = [
       options: ["Coloring sectors", "Drawing a circle", "Labeling", "Measuring angles"],
       correctAnswer: "Drawing a circle"
     },
-
-    // ✅ MEDIUM
     {
       difficulty: "Medium",
       questionText: "If a sector angle is 144°, what portion of the circle does it represent?",
@@ -100,35 +92,32 @@ const kcAssessmentsData = [
       correctAnswer: "2/5",
       hint: { text: "Fraction = angle / 360 → 144 / 360.", unlockTime: 10 }
     },
-
     {
       difficulty: "Medium",
       questionText: "A category has 35% data. What angle should you draw?",
       options: ["96°", "108°", "126°", "140°"],
       correctAnswer: "126°",
       hint: { text: "Angle = 35% × 360.", unlockTime: 10 },
-     animation: {
-  type: "pie-drawing",
-  config: {
-    data: [
-      { label: "126° Sector", value: 126, color: "#e11d48" },
-      { label: "Remaining", value: 234, color: "#e5e7eb" }
-    ],
-    steps: [
-      { type: "circle" },
-      { type: "center-point" },
-      { type: "radius" },
-      { type: "sector", index: 0 }
-    ],
-    options: {
-      showAngles: true,
-      stepDuration: 1000
-    }
-  }
-}
+      animation: {
+        type: "pie-drawing",
+        config: {
+          data: [
+            { label: "126° Sector", value: 126, color: "#e11d48" },
+            { label: "Remaining", value: 234, color: "#e5e7eb" }
+          ],
+          steps: [
+            { type: "circle" },
+            { type: "center-point" },
+            { type: "radius" },
+            { type: "sector", index: 0 }
+          ],
+          options: {
+            showAngles: true,
+            stepDuration: 1000
+          }
+        }
+      }
     },
-
-    // ✅ HARD (concept + reasoning)
     {
       difficulty: "Hard",
       questionText: "You drew sectors of 120°, 100°, and 80°. What mistake have you made?",
@@ -143,7 +132,6 @@ const kcAssessmentsData = [
     }
   ]
 },
-
 {
   kcId: "KC2",
   order: 3,
@@ -161,8 +149,6 @@ const kcAssessmentsData = [
       options: ["Half", "One-fourth", "One-third", "All"],
       correctAnswer: "One-fourth"
     },
-
-    // ✅ MEDIUM
     {
       difficulty: "Medium",
       questionText: "If butter occupies 72° in the pie chart, what percentage is it?",
@@ -170,7 +156,6 @@ const kcAssessmentsData = [
       correctAnswer: "20%",
       hint: { text: "(72 / 360) × 100.", unlockTime: 10 }
     },
-
     {
       difficulty: "Medium",
       questionText: "Total cake weight is 3 kg. A sector is 120°. How much cake does it represent?",
@@ -187,8 +172,6 @@ const kcAssessmentsData = [
         }
       }
     },
-
-    // ✅ HARD (multi-step + tricky)
     {
       difficulty: "Hard",
       questionText: "A pie chart shows 3 categories: A = 90°, B = 120°, C = ?. If total value is 600, find value of C.",
@@ -211,383 +194,383 @@ const kcAssessmentsData = [
     }
   ]
 },
-  // ==================== KC3 ASSESSMENTS ====================
+
+  // ==================== KC3 ASSESSMENTS (UPDATED) ====================
   {
-  kcId: "KC3",
-  order: 1,
-  subtopicName: "Subtopic 1: Introduction to Chance",
-  questions: [
-    {
-      difficulty: "Easy",
-      questionText: "What does 'chance' mean?",
-      options: ["A fixed result", "May or may not happen", "A formula", "A graph"],
-      correctAnswer: "May or may not happen"
-    },
-    {
-      difficulty: "Easy",
-      questionText: "Which is certain?",
-      options: ["Rolling 6", "Sun rising", "Winning match", "Getting heads"],
-      correctAnswer: "Sun rising"
-    },
-
-    {
-  difficulty: "Medium",
-  questionText: "Which situation involves uncertainty?",
-  options: ["2+2=4", "Water boils at 100°C", "Winning lottery", "Earth rotates"],
-  correctAnswer: "Winning lottery",
-  hint: { text: "Uncertainty = result not fixed.", unlockTime: 10 },
-
-  
-},
-
-    {
-      difficulty: "Medium",
-      questionText: "Which event has higher chance?",
-      options: ["Getting 1 on die", "Getting even number", "Getting 6", "Getting 2"],
-      correctAnswer: "Getting even number",
-      hint: { text: "Count favourable outcomes.", unlockTime: 10 }
-    },
-
-    {
-  difficulty: "Hard",
-  questionText: "A coin gave heads 7 times in a row. What is probability of head next?",
-  options: ["1", "1/2", "0", "7/8"],
-  correctAnswer: "1/2",
-  hint: { text: "Each toss is independent.", unlockTime: 20 },
-
-  animation: {
-    type: "coin-flip",
-    config: {
-      sequence: ["H", "H", "H", "H", "H", "H", "H"], // 🔥 past outcomes
-
-      nextFlip: {
-        possible: ["H", "T"],
-        probability: 0.5
+    kcId: "KC3",
+    order: 1,
+    subtopicName: "Subtopic 1: Introduction to Chance",
+    questions: [
+      {
+        difficulty: "Easy",
+        questionText: "What does 'chance' mean?",
+        options: [
+          "A fixed, known result",
+          "Something that may or may not happen",
+          "A maths formula",
+          "A type of graph"
+        ],
+        correctAnswer: "Something that may or may not happen",
+        hint: { text: "Think about something you are NOT sure will happen — like whether it will rain tomorrow.", unlockTime: 10 }
       },
-
-      options: {
-        showHistory: true,
-        animateFlips: true,
-        flipDuration: 500,
-        highlightNext: true,
-        showProbabilities: true
-      }
-    }
-  }
-}
-  ]
-},
-
-{
-  kcId: "KC3",
-  order: 2,
-  subtopicName: "Random Experiments & Outcomes",
-  questions: [
-    {
-      difficulty: "Easy",
-      questionText: "Random experiment means:",
-      options: ["Fixed result", "Unpredictable result", "Always same", "Graph"],
-      correctAnswer: "Unpredictable result"
-    },
-    {
-      difficulty: "Easy",
-      questionText: "Coin toss outcomes?",
-      options: ["1", "2", "3", "6"],
-      correctAnswer: "2"
-    },
-
-    {
-      difficulty: "Medium",
-      questionText: "Which is NOT random?",
-      options: ["Rolling die", "Drawing card", "2+3", "Coin toss"],
-      correctAnswer: "2+3",
-      hint: { text: "Does result change?", unlockTime: 10 }
-    },
-
-    {
-      difficulty: "Medium",
-      questionText: "A bag has 2 red, 2 blue, 1 green. Outcomes?",
-      options: ["3", "4", "5", "6"],
-      correctAnswer: "3",
-      hint: { text: "Outcomes = distinct results.", unlockTime: 10 }
-    },
-
-     {
-  difficulty: "Hard",
-  questionText: "Two coins tossed. Total outcomes?",
-  options: ["2", "3", "4", "6"],
-  correctAnswer: "4",
-  hint: { text: "List: HH, HT, TH, TT.", unlockTime: 20 },
-
-  animation: {
-    type: "coin-flip",
-    config: {
-      coins: 2,
-
-      steps: [
-        { type: "flip-first-coin" },
-        { type: "flip-second-coin" },
-
-        { type: "generate-outcomes" }, // HH, HT, TH, TT
-        { type: "grid-display" }       // show in 2x2 grid
-      ],
-
-      outcomes: [
-        { value: "HH", highlight: true },
-        { value: "HT", highlight: true },
-        { value: "TH", highlight: true },
-        { value: "TT", highlight: true }
-      ],
-
-      options: {
-        showTree: true,          // 🔥 tree diagram (best for learning)
-        showGrid: true,          // 2x2 visualization
-        animateFlips: true,
-        stepDuration: 800,
-        highlightAll: true,
-        showCount: true          // shows "Total = 4"
-      }
-    }
-  }
-}
-  ]
-},
-
-{
-  kcId: "KC3",
-  order: 3,
-  subtopicName: "Equally Likely Outcomes",
-  questions: [
-    {
-      difficulty: "Easy",
-      questionText: "Equally likely means:",
-      options: ["Same time", "Same chance", "One outcome", "Same result"],
-      correctAnswer: "Same chance"
-    },
-    {
-      difficulty: "Easy",
-      questionText: "Fair coin?",
-      options: ["Head more", "Tail more", "Equal", "None"],
-      correctAnswer: "Equal"
-    },
-
-   {
-  difficulty: "Medium",
-  questionText: "Bag: 4 red, 1 blue. Are outcomes equal?",
-  options: ["Yes", "No", "Maybe", "Can't say"],
-  correctAnswer: "No",
-  hint: { text: "Count frequency.", unlockTime: 10 },
-
-  animation: {
-    type: "equal-outcomes",
-    config: {
-      items: [
-        { label: "Red", count: 4, color: "#ef4444" },
-        { label: "Blue", count: 1, color: "#3b82f6" }
-      ],
-
-      steps: [
-        { type: "show-items" },          // display 4 red, 1 blue
-        { type: "group-by-color" },      // group them visually
-        { type: "highlight-frequency" }, // show counts
-        { type: "compare" }              // compare sizes
-      ],
-
-      probabilities: [
-        { label: "Red", value: "4/5", decimal: 0.8 },
-        { label: "Blue", value: "1/5", decimal: 0.2 }
-      ],
-
-      options: {
-        showCounts: true,
-        animateGrouping: true,
-        highlightDifference: true,
-        showProbabilityLabels: true,
-        stepDuration: 800
-      }
-    }
-  }
-},
-
-    {
-      difficulty: "Medium",
-      questionText: "Which is fair?",
-      options: ["Biased die", "Weighted coin", "Fair die", "Unequal balls"],
-      correctAnswer: "Fair die",
-      hint: { text: "Equal chance for all.", unlockTime: 10 }
-    },
-
-    {
-      difficulty: "Hard",
-      questionText: "A die shows 6 twice as often. Is it fair?",
-      options: ["Yes", "No", "Maybe", "Equal"],
-      correctAnswer: "No",
-      hint: { text: "Equal outcomes required.", unlockTime: 20 }
-    }
-  ]
-},
-
-{
-  kcId: "KC3",
-  order: 4,
-  subtopicName: "Probability",
-  questions: [
-    {
-      difficulty: "Easy",
-      questionText: "P(head) in coin?",
-      options: ["0", "1", "1/2", "2"],
-      correctAnswer: "1/2"
-    },
-    {
-      difficulty: "Easy",
-      questionText: "Die outcomes?",
-      options: ["2", "4", "6", "12"],
-      correctAnswer: "6"
-    },
-
-    {
-  difficulty: "Medium",
-  questionText: "P(odd number on die)?",
-  options: ["1/2", "1/3", "1/6", "2/3"],
-  correctAnswer: "1/2",
-  hint: { text: "Odd = 1,3,5 → 3/6.", unlockTime: 10 },
-
-},
-
-    {
-      difficulty: "Medium",
-      questionText: "P(number >4)?",
-      options: ["1/6", "2/6", "3/6", "4/6"],
-      correctAnswer: "2/6",
-      hint: { text: "5,6 only.", unlockTime: 10 }
-    },
-
-    {
-      difficulty: "Hard",
-      questionText: "Bag: 3 red, 3 blue, 4 green. P(green)?",
-      options: ["4/10", "3/10", "1/2", "2/5"],
-      correctAnswer: "4/10",
-      hint: { text: "Total = 10, green = 4.", unlockTime: 20 }
-    }
-  ]
-},
-
-{
-  kcId: "KC3",
-  order: 5,
-  subtopicName: "Events",
-  questions: [
-    {
-      difficulty: "Easy",
-      questionText: "Event means:",
-      options: ["Experiment", "Outcome group", "Total", "Graph"],
-      correctAnswer: "Outcome group"
-    },
-    {
-      difficulty: "Easy",
-      questionText: "Even numbers?",
-      options: ["1,3,5", "2,4,6", "All", "None"],
-      correctAnswer: "2,4,6"
-    },
-
-   {
-  difficulty: "Medium",
-  questionText: "Event: multiples of 3?",
-  options: ["1,2", "3,6", "2,4", "5"],
-  correctAnswer: "3,6",
-  hint: { text: "Multiples of 3.", unlockTime: 10 },
-
-  animation: {
-    type: "event-highlight",
-    config: {
-      sampleSpace: [1, 2, 3, 4, 5, 6],
-
-      event: {
-        label: "Multiples of 3",
-        outcomes: [3, 6]
+      {
+        difficulty: "Easy",
+        questionText: "Which of these is certain to happen?",
+        options: [
+          "Getting a 6 when you roll a die",
+          "The sun rising tomorrow",
+          "Your team winning the cricket match",
+          "Getting heads on a coin flip"
+        ],
+        correctAnswer: "The sun rising tomorrow",
+        hint: { text: "Which one happens every single day, without fail, no matter what?", unlockTime: 10 }
       },
-
-      steps: [
-        { type: "show-sample-space" },   // show all outcomes
-        { type: "highlight-event" },     // highlight 3 and 6
-        { type: "separate-event" },      // visually separate them
-        { type: "label-event" }          // label as event
-      ],
-
-      options: {
-        animateHighlight: true,
-        highlightColor: "#22c55e",
-        dimOthers: true,
-        showLabels: true,
-        stepDuration: 800,
-        showSetNotation: true   // 🔥 A = {3, 6}
+      {
+        difficulty: "Medium",
+        questionText: "Which situation involves chance?",
+        options: [
+          "3 × 4 = 12",
+          "Water freezes at 0°C",
+          "Winning a lucky draw",
+          "Earth orbiting the sun"
+        ],
+        correctAnswer: "Winning a lucky draw",
+        hint: { text: "Which result cannot be known in advance?", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "Why do we study chance?",
+        options: [
+          "To make uncertainty disappear",
+          "To understand how likely events are",
+          "To create equations",
+          "To draw bar graphs"
+        ],
+        correctAnswer: "To understand how likely events are",
+        hint: { text: "Chance helps us predict — not guarantee.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Hard",
+        questionText: "Ravi says: “I got tails 5 times in a row, so I must get heads next.” Is he right?",
+        options: [
+          "Yes — it balances out each turn",
+          "No — each coin flip is independent of the last",
+          "Yes — tails cannot occur 6 times in a row",
+          "No — coins always give tails"
+        ],
+        correctAnswer: "No — each coin flip is independent of the last",
+        hint: { text: "Does a coin “remember” what it showed last time?", unlockTime: 20 },
+        animation: {
+          type: "coin-flip",
+          config: {
+            sequence: ["T", "T", "T", "T", "T"],
+            nextFlip: { possible: ["H", "T"], probability: 0.5 },
+            options: { showHistory: true, animateFlips: true, flipDuration: 500, highlightNext: true, showProbabilities: true }
+          }
+        }
       }
-    }
+    ]
+  },
+  {
+    kcId: "KC3",
+    order: 2,
+    subtopicName: "Random Experiments & Outcomes",
+    questions: [
+      {
+        difficulty: "Easy",
+        questionText: "What makes an experiment 'random'?",
+        options: [
+          "It has a fixed, known result",
+          "Its result cannot be predicted in advance",
+          "It involves drawing graphs",
+          "It always gives the same outcome"
+        ],
+        correctAnswer: "Its result cannot be predicted in advance",
+        hint: { text: "Think about whether you can know the result before doing the experiment.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Easy",
+        questionText: "How many outcomes does tossing a fair coin have?",
+        options: ["1", "2", "3", "6"],
+        correctAnswer: "2",
+        hint: { text: "What are the two possible sides of a coin?", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "Which of the following is NOT a random experiment?",
+        options: [
+          "Rolling a die",
+          "Drawing a card from a shuffled deck",
+          "Calculating 12 × 5",
+          "Tossing a coin"
+        ],
+        correctAnswer: "Calculating 12 × 5",
+        hint: { text: "Is the result always fixed, or can it change?", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "A bag has a red, a blue, and a green ball. You pick one without looking. How many outcomes are there?",
+        options: ["1", "2", "3", "6"],
+        correctAnswer: "3",
+        hint: { text: "Count how many different balls you could possibly pick.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Hard",
+        questionText: "You try to start a scooter. Which best describes the possible outcomes?",
+        options: [
+          "Only 'starts' is an outcome",
+          "'Starts' and 'does not start'",
+          "Only 'does not start' is an outcome",
+          "No outcomes exist"
+        ],
+        correctAnswer: "'Starts' and 'does not start'",
+        hint: { text: "Think of all possible results, including success and failure.", unlockTime: 20 }
+      }
+    ]
+  },
+  {
+    kcId: "KC3",
+    order: 3,
+    subtopicName: "Equally Likely Outcomes",
+    questions: [
+      {
+        difficulty: "Easy",
+        questionText: "What does 'equally likely' mean?",
+        options: [
+          "All outcomes happen at the same time",
+          "Each outcome has the same chance of occurring",
+          "Only one outcome is possible",
+          "Outcomes are always the same"
+        ],
+        correctAnswer: "Each outcome has the same chance of occurring",
+        hint: { text: "Think: do all outcomes have an equal chance, or not?", unlockTime: 10 }
+      },
+      {
+        difficulty: "Easy",
+        questionText: "On a fair coin, the chance of getting Heads compared to Tails is:",
+        options: [
+          "Head is more likely",
+          "Tail is more likely",
+          "Both are equally likely",
+          "Neither can occur"
+        ],
+        correctAnswer: "Both are equally likely",
+        hint: { text: "A fair coin has no bias—both sides are balanced.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "You have a bag with 5 red balls and 1 blue ball. Are the outcomes equally likely?",
+        options: [
+          "Yes — there are still only 2 colours",
+          "No — red has a much greater chance",
+          "Yes — all experiments are equally likely",
+          "Cannot be determined"
+        ],
+        correctAnswer: "No — red has a much greater chance",
+        hint: { text: "More items of one type means a higher chance of picking it.", unlockTime: 10 },
+        animation: {
+          type: "equal-outcomes",
+          config: {
+            items: [
+              { label: "Red", count: 5, color: "#ef4444" },
+              { label: "Blue", count: 1, color: "#3b82f6" }
+            ],
+            steps: [{ type: "show-items" }, { type: "group-by-color" }, { type: "highlight-frequency" }, { type: "compare" }],
+            options: { showCounts: true, animateGrouping: true, highlightDifference: true, showProbabilityLabels: true, stepDuration: 800 }
+          }
+        }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "Which experiment produces equally likely outcomes?",
+        options: [
+          "Guessing a friend's favourite colour",
+          "Predicting tomorrow's weather",
+          "Throwing a standard fair die",
+          "Picking from a bag with different numbers of balls"
+        ],
+        correctAnswer: "Throwing a standard fair die",
+        hint: { text: "Look for situations where every outcome has the same probability.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Hard",
+        questionText: "A die is 'loaded' — the number 6 is slightly heavier so it faces down more. Are the outcomes equally likely?",
+        options: [
+          "Yes — a die always has 6 faces",
+          "No — some numbers appear more often than others",
+          "Yes — all six numbers can still appear",
+          "Cannot say without more data"
+        ],
+        correctAnswer: "No — some numbers appear more often than others",
+        hint: { text: "If something is not fair or balanced, some outcomes become more likely than others.", unlockTime: 20 }
+      }
+    ]
+  },
+  {
+    kcId: "KC3",
+    order: 4,
+    subtopicName: "Probability",
+    questions: [
+      {
+        difficulty: "Easy",
+        questionText: "A fair coin is tossed one time. What is the probability of getting Heads?",
+        options: ["0", "1", "1/2", "2"],
+        correctAnswer: "1/2",
+        hint: { text: "A coin has two possible outcomes — Head and Tail. Both have equal chance.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Easy",
+        questionText: "A standard die is rolled once. How many possible outcomes can you get?",
+        options: ["2", "4", "6", "12"],
+        correctAnswer: "6",
+        hint: { text: "Look at the numbers on a die. Count all the faces carefully.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "A fair die is rolled once. What is the probability of getting an even number?",
+        options: ["1/6", "2/6", "3/6", "4/6"],
+        correctAnswer: "3/6",
+        hint: { text: "Even numbers on a die are 2, 4, and 6. Count them and compare with total outcomes.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "A fair die is rolled once. What is the probability of getting a number less than 3?",
+        options: ["1/6", "2/6", "3/6", "5/6"],
+        correctAnswer: "2/6",
+        hint: { text: "Numbers less than 3 are 1 and 2. Count how many such outcomes are possible.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Hard",
+        questionText: "A bag contains 3 red balls, 2 blue balls, and 1 green ball. One ball is picked at random. What is the probability that the ball picked is not blue?",
+        options: ["2/6", "3/6", "4/6", "5/6"],
+        correctAnswer: "4/6",
+        hint: { text: "First find the total number of balls. Then count balls that are not blue (red + green).", unlockTime: 20 }
+      }
+    ]
+  },
+  {
+    kcId: "KC3",
+    order: 5,
+    subtopicName: "Events",
+    questions: [
+      {
+        difficulty: "Easy",
+        questionText: "Which of the following best describes an event in probability?",
+        options: [
+          "The process of performing an experiment",
+          "One or more outcomes we are interested in",
+          "The total number of all possible outcomes",
+          "A graphical representation of data"
+        ],
+        correctAnswer: "One or more outcomes we are interested in",
+        hint: { text: "An event focuses only on the outcomes you care about, not all outcomes.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Easy",
+        questionText: "Which set correctly represents the event “getting an even number” when rolling a die?",
+        options: ["{1, 3, 5}", "{2, 4, 6}", "{1, 2, 3, 4, 5, 6}", "{2, 4}"],
+        correctAnswer: "{2, 4, 6}",
+        hint: { text: "Even numbers are divisible by 2.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "How many outcomes are there in the event “getting an even number” when rolling a die?",
+        options: ["2", "3", "6", "1"],
+        correctAnswer: "3",
+        hint: { text: "List the outcomes in the event first, then count them.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "What is the probability of getting a prime number when rolling a fair die? (Prime numbers: 2, 3, 5)",
+        options: ["1/6", "2/6", "3/6 = 1/2", "5/6"],
+        correctAnswer: "3/6 = 1/2",
+        hint: { text: "Probability = (number of favourable outcomes) ÷ (total outcomes).", unlockTime: 10 },
+        animation: {
+          type: "event-highlight",
+          config: {
+            sampleSpace: [1, 2, 3, 4, 5, 6],
+            event: { label: "Prime Numbers", outcomes: [2, 3, 5] },
+            steps: [{ type: "show-sample-space" }, { type: "highlight-event" }, { type: "separate-event" }, { type: "label-event" }],
+            options: { animateHighlight: true, highlightColor: "#22c55e", dimOthers: true, showLabels: true, stepDuration: 800, showSetNotation: true }
+          }
+        }
+      },
+      {
+        difficulty: "Hard",
+        questionText: "Which of the following cannot be considered a valid event when tossing two coins?",
+        options: [
+          "Getting two Heads (HH)",
+          "Getting one Head and one Tail",
+          "Getting three Heads",
+          "Getting at least one Tail"
+        ],
+        correctAnswer: "Getting three Heads",
+        hint: { text: "Compare the number of coins with the number of heads mentioned—can that outcome exist?", unlockTime: 20 }
+      }
+    ]
+  },
+  {
+    kcId: "KC3",
+    order: 6,
+    subtopicName: "Probability in Real Life",
+    questions: [
+      {
+        difficulty: "Easy",
+        questionText: "Which of the following is a real-life use of probability?",
+        options: [
+          "Weather forecasting",
+          "Election predictions",
+          "Quality checks in factories",
+          "All of the above"
+        ],
+        correctAnswer: "All of the above",
+        hint: { text: "Think about where we use chances to make predictions in daily life.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Easy",
+        questionText: "If P(rain today) = 0, what does that mean?",
+        options: [
+          "It will definitely rain",
+          "There is a small chance of rain",
+          "It is impossible for it to rain today",
+          "We do not know if it will rain"
+        ],
+        correctAnswer: "It is impossible for it to rain today",
+        hint: { text: "A probability of 0 means the event cannot happen at all.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "P(event) = 1 means:",
+        options: [
+          "The event is impossible",
+          "The event is equally likely to happen or not",
+          "The event is certain to happen",
+          "The event has not been defined"
+        ],
+        correctAnswer: "The event is certain to happen",
+        hint: { text: "P = 1 means 100% chance — it will definitely occur.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Medium",
+        questionText: "The Meteorological Department says P(rain) = 3/10. What is the probability of no rain?",
+        options: ["3/10", "7/10", "1/10", "10/3"],
+        correctAnswer: "7/10",
+        hint: { text: "Total probability is always 1. So subtract: 1 − 3/10.", unlockTime: 10 }
+      },
+      {
+        difficulty: "Hard",
+        questionText: "An exit poll surveys 500 people as they leave a polling booth. It predicts Candidate A will win with P = 3/5. Why might this prediction be wrong?",
+        options: [
+          "Probability can never be applied to elections",
+          "The sample may not represent all voters accurately",
+          "P = 3/5 means Candidate A definitely wins",
+          "Exit polls are always perfectly accurate"
+        ],
+        correctAnswer: "The sample may not represent all voters accurately",
+        hint: { text: "Think: does asking only some people always reflect everyone’s opinion?", unlockTime: 20 }
+      }
+    ]
   }
-},
-    {
-      difficulty: "Medium",
-      questionText: "P(prime on die)?",
-      options: ["1/6", "2/6", "3/6", "4/6"],
-      correctAnswer: "3/6",
-      hint: { text: "2,3,5 → 3 outcomes.", unlockTime: 10 }
-    },
-
-    {
-      difficulty: "Hard",
-      questionText: "Two coins: event = exactly one head. Probability?",
-      options: ["1/4", "1/2", "3/4", "1"],
-      correctAnswer: "1/2",
-      hint: { text: "HT, TH → 2/4.", unlockTime: 20 }
-    }
-  ]
-},
-
-{
-  kcId: "KC3",
-  order: 6,
-  subtopicName: "Probability in Real Life",
-  questions: [
-    {
-      difficulty: "Easy",
-      questionText: "Use of probability?",
-      options: ["Weather", "Elections", "Quality", "All"],
-      correctAnswer: "All"
-    },
-    {
-      difficulty: "Easy",
-      questionText: "P=0 means?",
-      options: ["Certain", "Impossible", "Maybe", "Unknown"],
-      correctAnswer: "Impossible"
-    },
-
-   {
-  difficulty: "Medium",
-  questionText: "P(not rain) if P(rain)=0.4?",
-  options: ["0.4", "0.6", "1.4", "0"],
-  correctAnswer: "0.6",
-  hint: { text: "1 − P(event).", unlockTime: 10 },
-
-  
-},
-
-    {
-      difficulty: "Medium",
-      questionText: "P(event)=1 means?",
-      options: ["Impossible", "Certain", "Half", "Unknown"],
-      correctAnswer: "Certain",
-      hint: { text: "1 = 100%.", unlockTime: 10 }
-    },
-
-    {
-      difficulty: "Hard",
-      questionText: "Survey says win chance = 0.7. What does it mean?",
-      options: ["Guaranteed win", "Likely but not certain", "Impossible", "Exact result"],
-      correctAnswer: "Likely but not certain",
-      hint: { text: "Probability ≠ guarantee.", unlockTime: 20 }
-    }
-  ]
-}
 ];
 
 const seedAssessments = async () => {
