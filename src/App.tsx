@@ -30,6 +30,22 @@ export default function App() {
       completedTopics: []
     };
   });
+  useEffect(() => {
+  const handleTabClose = () => {
+    if (sessionId) {
+      // 🛰️ navigator.sendBeacon tells the server "I left the site!" 
+      // It successfully runs even if the browser tab is closing!
+      navigator.sendBeacon(`https://ats-app-2.onrender.com/api/merge/sessions/${sessionId}/exit`);
+    }
+  };
+
+  // Listens to the user closing the browser tab or window
+  window.addEventListener("beforeunload", handleTabClose);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleTabClose);
+  };
+}, [sessionId]);
 
   const startUserSession = async () => {
     try {
