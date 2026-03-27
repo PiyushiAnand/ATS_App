@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { CheckCircle2, Lock, PlayCircle, Trophy, BarChart3 } from 'lucide-react';
 import { KNOWLEDGE_COMPONENTS, KC_LAST_ORDER } from '../services/bkt';
 import { LearnerState } from '../types';
-
+const API = "https://ats-app-2.onrender.com";
 interface Lesson {
   _id: string;
   kcId: string;
@@ -30,7 +30,7 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
 
       for (const kc of KNOWLEDGE_COMPONENTS) {
         try {
-          const res = await fetch(`/api/lessons/${kc.id}`, {
+          const res = await fetch(`${API}/api/lessons/${kc.id}`, {
             credentials: 'include',
           });
           console.log(`Fetching lessons for ${kc.id}, status:`, res.status);
@@ -52,7 +52,7 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
 
   const fetchMastery = async () => { 
     try { 
-      const res = await fetch('/api/mastery/get_mastery', { credentials: 'include', }); 
+      const res = await fetch(`${API}/api/mastery/get_mastery`, { credentials: 'include', }); 
     if (!res.ok) throw new Error('Failed to fetch mastery'); 
     const data = await res.json(); console.log("MASTERYYYY:", data); 
     setMasteryState(data.mastery || {}); setCompletedTopicsState(data.completedTopics || []); 

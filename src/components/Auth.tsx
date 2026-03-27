@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { LogIn, UserPlus, GraduationCap, ArrowRight, AlertCircle } from 'lucide-react';
-
+const API = "https://ats-app-2.onrender.com";
 interface AuthProps {
   onLogin: (user: { name: string; email: string; mastery: Record<string, number>; completedTopics: string[] }) => void;
 }
@@ -19,7 +19,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     setError(null);
     setLoading(true);
 
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
+    const endpoint = isLogin ? `${API}/api/auth/login` : `${API}/api/auth/signup`;
     const body = isLogin ? { email, password } : { name, email, password };
 
     try {

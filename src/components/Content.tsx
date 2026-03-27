@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
 import { seedRemedial } from '../data/seedRemedial';
-
+const API = "https://ats-app-2.onrender.com";
 const getEmbedUrl = (url) => {
   if (!url) return '';
   if (url.includes('youtu.be/')) {
@@ -790,7 +790,7 @@ export const Content: React.FC<ContentProps> = ({
   useEffect(() => {
     const fetchLesson = async () => {
       try {
-        const res = await fetch(`/api/lessons/${kcId}/${order}`, {
+        const res = await fetch(`${API}/api/lessons/${kcId}/${order}`, {
           credentials: 'include',
         });
 
@@ -801,7 +801,7 @@ export const Content: React.FC<ContentProps> = ({
         console.log(data);
         let questions: Question[] = [];
         if (lessonId) {
-          const assessRes = await fetch(`/api/assessments/lesson/${lessonId}`, {
+          const assessRes = await fetch(`${API}/api/assessments/lesson/${lessonId}`, {
             credentials: 'include',
           });
 
@@ -897,7 +897,7 @@ export const Content: React.FC<ContentProps> = ({
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
 
     try {
-      const res = await fetch('/api/responses/submit', {
+      const res = await fetch(`${API}/api/responses/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

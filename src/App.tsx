@@ -11,6 +11,7 @@ import { EngagementCheck } from './components/EngagementCheck';
 import { KNOWLEDGE_COMPONENTS, updateMastery, KC_LAST_ORDER } from './services/bkt';
 import { LearnerState } from './types';
 import { LogOut, User, Bell } from 'lucide-react';
+const API = "https://ats-app-2.onrender.com";
 
 export default function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
@@ -34,7 +35,7 @@ export default function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/user/me', {
+        const response = await fetch(`${API}/api/user/me`, {
           credentials: 'include'
         });
 
@@ -64,7 +65,7 @@ export default function App() {
 
     const syncState = async () => {
       try {
-        await fetch('/api/user/state', {
+        await fetch(`${API}/api/user/state`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -94,7 +95,7 @@ export default function App() {
 
   // ✅ LOGOUT
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', {
+    await fetch(`${API}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });
