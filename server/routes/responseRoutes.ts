@@ -15,8 +15,7 @@ router.post("/submit", authenticate, async (req, res) => {
     selectedOption, 
     timeTaken, 
     hintCount, 
-    attemptCount, 
-    errorType 
+    attemptCount
   } = req.body;
 
   try {
@@ -110,7 +109,7 @@ router.post("/submit", authenticate, async (req, res) => {
     newMastery -= (beta * Math.max(0, (attemptCount || 1) - 1));
 
     // Repeated Error Adjustment
-    if (errorType === 'repeated' || attemptCount >= 3) {
+    if (attemptCount >= 3) {
       newMastery -= lambda;
     }
 
@@ -121,23 +120,12 @@ router.post("/submit", authenticate, async (req, res) => {
     user.mastery.set(kcId, newMastery);
     await user.save();
 
-    // Decision / Recommendation Engine
-    let recommendation = "practice";
-    if (newMastery >= 0.8) {
-      recommendation = "next_kc";
-    } else if (newMastery >= 0.5) {
-      recommendation = "practice";
-    } else {
-      recommendation = "remedial"; // Less than 0.5
-    }
-
     // 4. Send response back to the frontend
     res.json({
       correct: isCorrect,
       correctAnswer: isCorrect ? null : question.correctAnswer, 
       remedialExplanation: isCorrect ? null : question.remedialExplanation,
-      newMasteryLevel: newMastery,
-      recommendation // Return this so the UI can adapt dynamically!
+      newMasteryLevel: newMastery
     });
 
   } catch (err) {
