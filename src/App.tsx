@@ -18,7 +18,7 @@ export default function App() {
   const [activeKC, setActiveKC] = useState<string | null>(null);
   const [activeOrder, setActiveOrder] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [learnerState, setLearnerState] = useState<LearnerState>(() => {
     const initialMastery: Record<string, number> = {};
     KNOWLEDGE_COMPONENTS.forEach(kc => {
@@ -31,6 +31,21 @@ export default function App() {
     };
   });
 
+  const startUserSession = async () => {
+    try {
+      const response = await fetch(`${API}/api/session/start`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSessionId(data.sessionId);
+        console.log("📍 Tracking Session Activated:", data.sessionId);
+      }
+    } catch (err) {
+      console.error("Failed to start session metrics", err);
+    }
+  };
   // ✅ AUTH CHECK
   useEffect(() => {
     const checkAuth = async () => {
@@ -48,6 +63,8 @@ export default function App() {
             mastery: data.mastery || {},
             completedTopics: data.completedTopics || []
           });
+
+          startUserSession();
         }
       } catch (err) {
         console.error("Auth check failed", err);
@@ -91,15 +108,29 @@ export default function App() {
       mastery: userData.mastery || {},
       completedTopics: userData.completedTopics || []
     });
+
+    startUserSession();
   };
 
   // ✅ LOGOUT
   const handleLogout = async () => {
+
+    if (sessionId) {
+        await fetch(`${API}/api/session/complete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ sessionId })
+        });
+        console.log("🏁 Session closed successfully.");
+    }
+
     await fetch(`${API}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });
     setUser(null);
+    setSessionId(null); // Reset
   };
 
   // ✅ BKT UPDATE
@@ -186,7 +217,7 @@ export default function App() {
           <Content
             kcId={activeKC}
             order={activeOrder}
-
+            sessionId={sessionId}
             onBack={() => {
               setActiveKC(null);
               setActiveOrder(null);

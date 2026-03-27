@@ -752,6 +752,7 @@ interface ContentProps {
   onComplete: (kcId: string, order: number, score: number) => void;
   onAnswer: (isCorrect: boolean) => void;
   onRestartKC: (kcId: string) => void;
+  sessionId: string | null; // 👈 Add this here
 }
 
 export const Content: React.FC<ContentProps> = ({
@@ -762,7 +763,8 @@ export const Content: React.FC<ContentProps> = ({
   onBack,
   onComplete,
   onAnswer,
-  onRestartKC
+  onRestartKC,
+  sessionId
 }) => {
   const [section, setSection] = useState<ContentSection | null>(null);
   const [loading, setLoading] = useState(true);
@@ -902,6 +904,7 @@ export const Content: React.FC<ContentProps> = ({
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
+          sessionId,
           attemptId: null,
           questionId: currentQuestion._id,
           kcId,

@@ -8,6 +8,8 @@ import lessonRoutes from "./routes/lessonRoutes";
 import assessmentRoutes from "./routes/assessmentRoutes";
 import responseRoutes from "./routes/responseRoutes";
 import masteryRoute from "./routes/masteryRoute";
+import sessionRoute from "./routes/saveSessionRoutes"
+import mergeAPIRoutes from "./routes/mergeAPIRoutes";
 import cors from "cors";
 
 const app = express();
@@ -33,7 +35,8 @@ app.use("/api/assessments", assessmentRoutes);
 app.use("/api/responses", responseRoutes);
 app.use("/api/mastery", masteryRoute);
 
-
+app.use("/api/merge", mergeAPIRoutes);
+app.use("/api/session", sessionRoute);
 // Health Check
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

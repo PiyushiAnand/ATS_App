@@ -15,7 +15,8 @@ router.post("/submit", authenticate, async (req, res) => {
     selectedOption, 
     timeTaken, 
     hintCount, 
-    attemptCount
+    attemptCount,
+    sessionId
   } = req.body;
 
   try {
@@ -33,7 +34,8 @@ router.post("/submit", authenticate, async (req, res) => {
       correctness: isCorrect,
       timeTaken,
       hintTaken: hintCount > 0, // Convert hintCount to a boolean for backward compatibility
-      attemptCount
+      attemptCount,
+      sessionId
     });
     await newResponse.save();
 

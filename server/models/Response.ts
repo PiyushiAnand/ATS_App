@@ -4,6 +4,7 @@ import { Document, Schema, Model, Types } from "mongoose";
 // 1. Define the TypeScript Interface for the Response Document
 export interface IResponse extends Document {
   userId: Types.ObjectId; // Reference to the User
+  sessionId: { type: mongoose.Schema.Types.ObjectId, ref: "Session", required: true },
   problemId: Types.ObjectId; // Reference to the Content (Question)
   kcId: "KC1" | "KC2" | "KC3"; // The specific Knowledge Component being tested
   correctness: boolean; // True if the student got it right, False if wrong
