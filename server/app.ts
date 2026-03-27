@@ -11,11 +11,18 @@ import masteryRoute from "./routes/masteryRoute";
 import cors from "cors";
 const app = express();
 
+
 // Middleware
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(
+  cors({
+    origin:[ "http://localhost:5173", // Your local React dev server
+    "https://ats-frontend-uxub.onrender.com"],
+    credentials: true,               // Crucial for HTTP cookies and JWT to pass through!
+  })
+);
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
@@ -25,13 +32,7 @@ app.use("/api/assessments", assessmentRoutes);
 app.use("/api/responses", responseRoutes);
 app.use("/api/mastery", masteryRoute);
 
-app.use(
-  cors({
-    origin:[ "http://localhost:5173", // Your local React dev server
-    "https://ats-frontend-uxub.onrender.com"],
-    credentials: true,               // Crucial for HTTP cookies and JWT to pass through!
-  })
-);
+
 // Health Check
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
