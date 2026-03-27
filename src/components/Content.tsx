@@ -4,6 +4,19 @@ import { ArrowLeft } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
 import { seedRemedial } from '../data/seedRemedial';
 
+const getEmbedUrl = (url) => {
+  if (!url) return '';
+  if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1].split('?')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (url.includes('youtube.com/watch')) {
+    const urlObj = new URL(url);
+    const videoId = urlObj.searchParams.get('v');
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  return url; 
+};
 /* =========================
    🎬 SIMPLE ANIMATION COMPONENTS
 ========================= */
@@ -1066,7 +1079,11 @@ export const Content: React.FC<ContentProps> = ({
         {step === 'remedial' && (
           <motion.div key="remedial">
             {(() => {
-              const remedialData = seedRemedial.find(r => r.kcId === kcId);
+              const processedLessonsData = seedRemedial.map(lesson => ({
+                ...lesson,
+                videoUrl: getEmbedUrl(lesson.videoUrl)
+              }));
+              const remedialData = processedLessonsData.find(r => r.kcId === kcId);
               if (!remedialData) return <div>No remedial content found.</div>;
 
               return (

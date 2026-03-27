@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     hmr: process.env.DISABLE_HMR !== 'true',
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': 'https://ats-app-2.onrender.com',
     },
   },
 });

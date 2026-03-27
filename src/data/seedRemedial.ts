@@ -17,7 +17,7 @@ export const seedRemedial: RemedialContent[] = [
       "• Understanding what each symbol or bar represents\n" +
       "• Reading data carefully before answering\n\n" +
       "Watch the video below and then try the questions again. You’ve got this!",
-    videoUrl: "https://youtu.be/8eDW4zjIxY8?si=zcObly1EGA85M4W2"
+    videoUrl: "https://youtu.be/su3NNcgJ4LE?si=Q3_87zGuibK5DEQX"
   },
   {
     kcId: "KC2",
@@ -29,7 +29,7 @@ export const seedRemedial: RemedialContent[] = [
       "• What variables (like x or y) mean\n" +
       "• How to solve basic equations step by step\n\n" +
       "Take your time with the video and try to follow along with examples. Practice will make it much easier!",
-    videoUrl: "https://www.youtube.com/embed/n2YkbdNORp8"
+    videoUrl: "https://youtu.be/C3pyrh2Izhk?si=kbcJDsLDJA9FRG2A"
   },
   {
     kcId: "KC3",
@@ -41,6 +41,6 @@ export const seedRemedial: RemedialContent[] = [
       "• Their properties (sides, angles, edges)\n" +
       "• Simple ways to measure or compare them\n\n" +
       "Watch carefully and try to visualize each concept — geometry becomes much easier when you can picture it!",
-    videoUrl: "https://www.youtube.com/embed/n2YkbdNORp8"
+    videoUrl: "https://youtu.be/lZSL7Tm5ViA?si=YQNxfYRD-IQDuyoO"
   }
 ];
