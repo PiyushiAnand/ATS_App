@@ -11,44 +11,75 @@ const router = Router();
 // 📍 API 1: Chapter Metadata API
 // Get canonical chapter setups and subtopics derived from Lessons & Contents
 // ============================================================================
-const getChapterMetadata = async (req: Request, res: Response) => {
+const getChapterMetadata = async (_req: Request, res: Response) => {
   try {
-    const { kcId } = req.params; // Expects "KC1", "KC2", or "KC3"
-
-    const lessons = await Lesson.find({ kcId }).sort({ order: 1 });
-    const questions = await Content.find({ kcId });
+    // 1. Fetch ALL lessons and ALL questions for the entire chapter
+    // We sort by kcId and then order to maintain a logical flow
+    const lessons = await Lesson.find({}).sort({ kcId: 1, order: 1 });
+    const questions = await Content.find({});
 
     if (!lessons.length) {
-      return res.status(404).json({ error: "Chapter lessons not found for this KC ID." });
+      return res.status(404).json({ error: "No lessons found for the Data Handling chapter." });
     }
 
-    // Map your lesson modules to Merge Team's subtopic objects
-    const subtopics = lessons.map((lesson) => ({
-      subtopic_id: `grade6_${kcId.toLowerCase()}_lesson_${lesson._id}`,
-      name: lesson.subtopicName,
-      difficulty: 0.5, // Normalized difficulty placeholder (0-1)
-    }));
+    const subtopicDifficultyMap: Record<string, number> = {
+      // KC1
+      "Introduction to Data and Organising Data": 0.2,
+      "Pictographs": 0.3,
+      "Bar Graphs": 0.4,
+      "Double Bar Graphs": 0.5,
+      // KC2
+      "Fractions & % calculations": 0.6,
+      "Drawing a pie chart": 0.7,
+      "Problem solving using Pie charts": 0.8,
+      // KC3
+      "Introduction to Chance": 0.4,
+      "Random Experiments & Outcomes": 0.5,
+      "Equally Likely Outcomes": 0.6,
+      "Probability": 0.7,
+      "Events": 0.7,
+      "Probability in Real Life": 0.8
+    };
+    // 2. Map every lesson across all KCs to the subtopics array
+    const subtopics = lessons.map((lesson) => {
+      // Clean the subtopic name by removing "Subtopic X:" prefix if it exists
+      const cleanName = lesson.subtopicName.split(':').pop()?.trim() || lesson.subtopicName;
+      
+      return {
+        subtopic_id: `grade6_${lesson.kcId.toLowerCase()}_${lesson.subtopicName}`,
+        name: `${lesson.kcId}: ${lesson.subtopicName}`,
+        difficulty: subtopicDifficultyMap[cleanName] || 0.5, // Fallback to 0.5 if name doesn't match
+      };
+    });
 
-    // Map content string difficulties to 0-1 normalized float
+    // 3. Calculate Average Difficulty across the whole chapter
     const difficultyMap: Record<string, number> = { Easy: 0.3, Medium: 0.6, Hard: 0.8 };
     const avgDifficulty = questions.length
       ? questions.reduce((sum, q) => sum + (difficultyMap[q.difficulty] || 0.5), 0) / questions.length
       : 0.5;
 
+    // 4. Final Payload representing the entire Grade 6 Data Handling chapter
     const metadataPayload = {
       grade: 6,
-      chapter_name: lessons[0].subtopicName.split(":")[0].trim(), // e.g. "Subtopic 1"
-      chapter_id: `grade6_${kcId.toLowerCase()}`, // Format: grade{number}_{name_snake_case}
+      chapter_name: "Data Handling",
+      chapter_id: "grade6_data_handling",
       chapter_url: "https://ats-frontend-uxub.onrender.com/",
       chapter_difficulty: Number(avgDifficulty.toFixed(2)),
-      expected_completion_time_seconds: lessons.length * 600, // Roughly 10 mins per lesson
+      expected_completion_time_seconds: 4000, 
       subtopics,
-      prerequisites: [],
+      prerequisites: [
+        "grade3_data_handling",
+        "grade4_tick_tick_tick", // Tallying and recording time-based data
+        "grade4_smart_charts",   // Core NCERT data handling chapter
+        "grade5_parts_and_wholes", // Foundation for Pie Charts
+        "grade5_smart_charts",   // Advanced tallying and bar representations
+        "grade5_ways_to_multiply_and_divide" // Arithmetic foundation for Probability
+      ],
     };
 
     return res.status(200).json(metadataPayload);
   } catch (error: any) {
-    return res.status(500).json({ error: "Server Error fetching metadata", details: error.message });
+    return res.status(500).json({ error: "Server Error fetching chapter metadata", details: error.message });
   }
 };
 
