@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
 import { seedRemedial } from '../data/seedRemedial';
@@ -100,7 +100,6 @@ const TallyAnimation = ({ count = 12 }: { count?: number}) => {
   );
 };
 
-import { motion } from "framer-motion";
 
 const PictographAnimation = ({ count = 7.5, icon = "🍎" }: { count?: number; icon?: string }) => {
   const fullIcons = Math.floor(count);
@@ -772,7 +771,8 @@ interface ContentProps {
   onComplete: (kcId: string, order: number, score: number) => void;
   onAnswer: (isCorrect: boolean) => void;
   onRestartKC: (kcId: string) => void;
-  sessionId: string | null; // 👈 Add this here
+  sessionId: string | null;
+  safeFetch: (url: string, options?: any) => Promise<Response>; // 👈 Add this
 }
 
 export const Content: React.FC<ContentProps> = ({
@@ -784,7 +784,8 @@ export const Content: React.FC<ContentProps> = ({
   onComplete,
   onAnswer,
   onRestartKC,
-  sessionId
+  sessionId,
+  safeFetch
 }) => {
   const [section, setSection] = useState<ContentSection | null>(null);
   const [loading, setLoading] = useState(true);
@@ -919,7 +920,7 @@ export const Content: React.FC<ContentProps> = ({
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
 
     try {
-      const res = await fetch(`${API}/api/responses/submit`, {
+      const res = await safeFetch(`${API}/api/responses/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -929,7 +930,7 @@ export const Content: React.FC<ContentProps> = ({
           questionId: currentQuestion._id,
           kcId,
           selectedOption: currentQuestion.options[selectedOption],
-          timeTaken,
+          timeTaken: isNaN(timeTaken) ? NaN : timeTaken, // Explicitly handle NaN for demonstration
           hintCount: showHint ? 1 : 0,
           attemptCount
         })
@@ -949,7 +950,7 @@ export const Content: React.FC<ContentProps> = ({
       }
 
     } catch (err) {
-      console.error(err);
+      console.error("Submission failed:", err);
     }
   };
 

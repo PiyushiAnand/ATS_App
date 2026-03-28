@@ -34,6 +34,98 @@ export default function App() {
       completedTopics: []
     };
   });
+
+  /* =========================
+     🛡️ SAFE FETCH & RETRY LOGIC
+  ========================= */
+  
+  // Recursively replace NaN with null for JSON compliance
+  const cleanPayload = (obj: any): any => {
+    if (obj === null || obj === undefined) return obj;
+    if (typeof obj === 'number' && isNaN(obj)) return null;
+    if (Array.isArray(obj)) return obj.map(cleanPayload);
+    if (typeof obj === 'object') {
+      const cleaned: any = {};
+      for (const key in obj) {
+        cleaned[key] = cleanPayload(obj[key]);
+      }
+      return cleaned;
+    }
+    return obj;
+  };
+
+  const storeFailedRequest = (url: string, options: any) => {
+    try {
+      const failedRequests = JSON.parse(localStorage.getItem('failed_api_requests') || '[]');
+      // Avoid duplicate storage of the exact same request if it's already there
+      const requestKey = `${options.method || 'GET'}:${url}:${JSON.stringify(options.body)}`;
+      if (!failedRequests.some((r: any) => r.key === requestKey)) {
+        failedRequests.push({ 
+          url, 
+          options, 
+          timestamp: Date.now(),
+          key: requestKey 
+        });
+        localStorage.setItem('failed_api_requests', JSON.stringify(failedRequests));
+        console.warn("📥 Network failure: Request stored locally for retry.", url);
+      }
+    } catch (e) {
+      console.error("Failed to store request locally", e);
+    }
+  };
+
+  const retryFailedRequests = async () => {
+    const failedRequests = JSON.parse(localStorage.getItem('failed_api_requests') || '[]');
+    if (failedRequests.length === 0) return;
+
+    console.log(`🔄 Attempting to retry ${failedRequests.length} failed requests...`);
+    const remainingRequests = [];
+
+    for (const req of failedRequests) {
+      try {
+        const response = await fetch(req.url, req.options);
+        if (response.ok) {
+          console.log("✅ Retry successful:", req.url);
+        } else {
+          remainingRequests.push(req);
+        }
+      } catch (err) {
+        remainingRequests.push(req);
+      }
+    }
+
+    localStorage.setItem('failed_api_requests', JSON.stringify(remainingRequests));
+  };
+
+  const safeFetch = async (url: string, options: any = {}) => {
+    // 1. Process body to handle NaN -> null
+    if (options.body && typeof options.body === 'string') {
+      try {
+        const parsed = JSON.parse(options.body);
+        options.body = JSON.stringify(cleanPayload(parsed));
+      } catch (e) { /* Not JSON */ }
+    }
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok && response.status >= 500) {
+        // Server error - might be worth retrying
+        storeFailedRequest(url, options);
+      }
+      return response;
+    } catch (err) {
+      // Network failure
+      storeFailedRequest(url, options);
+      throw err;
+    }
+  };
+
+  // Retry on mount and when windows goes online
+  useEffect(() => {
+    retryFailedRequests();
+    window.addEventListener('online', retryFailedRequests);
+    return () => window.removeEventListener('online', retryFailedRequests);
+  }, []);
       useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
           if (sessionId) {
@@ -56,9 +148,11 @@ export default function App() {
 
   const startUserSession = async () => {
     try {
-      const response = await fetch(`${API}/api/session/start`, {
+      const response = await safeFetch(`${API}/api/session/start`, {
         method: 'POST',
-        credentials: 'include'
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ sessionId }) // Send existing sessionId if we have it (idempotency)
       });
       if (response.ok) {
         const data = await response.json();
@@ -105,7 +199,7 @@ export default function App() {
 
     const syncState = async () => {
       try {
-        await fetch(`${API}/api/user/state`, {
+        await safeFetch(`${API}/api/user/state`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -139,7 +233,7 @@ export default function App() {
   const handleLogout = async () => {
 
     if (sessionId) {
-        await fetch(`${API}/api/session/complete`, {
+        await safeFetch(`${API}/api/session/complete`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -250,6 +344,7 @@ export default function App() {
             kcId={activeKC}
             order={activeOrder}
             sessionId={sessionId}
+            safeFetch={safeFetch} // 👈 Pass safeFetch here
             onBack={() => {
               setActiveKC(null);
               setActiveOrder(null);
