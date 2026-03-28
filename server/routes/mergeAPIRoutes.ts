@@ -46,7 +46,7 @@ const getChapterMetadata = async (_req: Request, res: Response) => {
       const cleanName = lesson.subtopicName.split(':').pop()?.trim() || lesson.subtopicName;
       
       return {
-        subtopic_id: `grade6_${lesson.kcId.toLowerCase()}_${lesson.subtopicName}`,
+        subtopic_id: `grade6_${lesson.kcId.toLowerCase()}_${lesson.order}`,
         name: `${lesson.kcId}: ${lesson.subtopicName}`,
         difficulty: subtopicDifficultyMap[cleanName] || 0.5, // Fallback to 0.5 if name doesn't match
       };
