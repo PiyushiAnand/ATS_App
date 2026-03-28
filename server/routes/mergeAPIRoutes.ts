@@ -60,7 +60,7 @@ const getChapterMetadata = async (_req: Request, res: Response) => {
     const difficultyMap: Record<string, number> = { Easy: 0.3, Medium: 0.6, Hard: 0.8 };
     const avgDifficulty = questions.length
       ? questions.reduce((sum, q) => sum + (difficultyMap[q.difficulty] || 0.5), 0) / questions.length
-      : 0.5;
+      : NaN;
 
     // 4. Final Payload representing the entire Grade 6 Data Handling chapter
     const metadataPayload = {
@@ -125,11 +125,11 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
       (q) => q.difficulty === "Medium" || q.difficulty === "Hard"
     ).length;
 
-    const time_spent_seconds = responses.reduce((sum, r) => sum + (r.timeTaken || 0), 0);
+    const time_spent_seconds = responses.reduce((sum, r) => sum + (r.timeTaken || NaN), 0);
 
     // 🎯 Real Dynamic Topic Completion Ratio
     const user = await User.findById(session.userId);
-    const completedTopicsCount = user?.completedTopics?.length || 0;
+    const completedTopicsCount = user?.completedTopics?.length || NaN;
     const topic_completion_ratio = Number((completedTopicsCount / 13).toFixed(2));
 
     // 2. Map schema terms to exact Merge contract field types
