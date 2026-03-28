@@ -147,9 +147,37 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
     };
 
     // 3. Validation sanity check
-    if (correct_answers + wrong_answers < questions_attempted) {
-      return res.status(400).json({
-        error: "Sanity check failed: Attempted problems cannot be greater than sum of correct + wrong results.",
+    // 1. correct + wrong <= attempted
+    if ((correct_answers + wrong_answers) > questions_attempted) {
+      return res.status(400).json({ 
+        error: "Validation Failed: Sum of results cannot exceed unique attempts." 
+      });
+    }
+
+    // 2. attempted <= total
+    // total_questions here should represent the total questions available in the chapter
+    if (questions_attempted > total_questions) {
+      return res.status(400).json({ 
+        error: "Validation Failed: Attempted count exceeds total available questions." 
+      });
+    }
+
+    // 3. hints_used <= total_hints
+    if (hints_used > total_hints_embedded) {
+      return res.status(400).json({ 
+        error: "Validation Failed: Used hints count cannot exceed available hints." 
+      });
+    }
+
+    // 4. ratios between 0-1
+    // Use NaN if no questions were attempted to avoid 'inventing' a 0% score
+    const success_ratio = questions_attempted > 0 
+      ? (correct_answers / questions_attempted) 
+      : NaN;
+
+    if (!isNaN(success_ratio) && (success_ratio < 0 || success_ratio > 1)) {
+      return res.status(400).json({ 
+        error: "Validation Failed: Success ratio must be between 0 and 1." 
       });
     }
 
