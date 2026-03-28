@@ -132,7 +132,7 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
     const sessionPayload = {
       student_id: session.userId.toString(), 
       session_id: session._id.toString(), // Unique reusable ID for safe idempotent network retries
-      chapter_id: `grade6_kc_mastery`, // Or dynamically query chapter from standard analytics
+      chapter_id: "grade6_data_handling", 
       timestamp: new Date().toISOString(),
       session_status: session_status || (session.endTime ? "completed" : "exited_midway"),
       correct_answers,

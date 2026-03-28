@@ -10,7 +10,7 @@ import { Content } from './components/Content';
 import { EngagementCheck } from './components/EngagementCheck';
 import { KNOWLEDGE_COMPONENTS, updateMastery, KC_LAST_ORDER } from './services/bkt';
 import { LearnerState } from './types';
-import { LogOut, User, Bell, X } from 'lucide-react';
+import { LogOut, User, Bell} from 'lucide-react';
 import { Profile } from './components/Profile';
 import { ExitModal } from './components/ExitModal';
 const API = "https://ats-app-2.onrender.com";
@@ -34,22 +34,25 @@ export default function App() {
       completedTopics: []
     };
   });
-  useEffect(() => {
-  const handleTabClose = () => {
-    if (sessionId) {
-      // 🛰️ navigator.sendBeacon tells the server "I left the site!" 
-      // It successfully runs even if the browser tab is closing!
-      navigator.sendBeacon(`https://ats-app-2.onrender.com/api/merge/sessions/${sessionId}/exit`);
-    }
-  };
+      useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+          if (sessionId) {
+            // 1. This triggers the native browser "Leave site?" popup
+            e.preventDefault();
+            e.returnValue = ''; // Standard requirement for modern browsers
 
-  // Listens to the user closing the browser tab or window
-  window.addEventListener("beforeunload", handleTabClose);
+            // 2. Fire the beacon to mark the session as exited midway
+            // Note: This fires as soon as the tab starts closing
+            navigator.sendBeacon(`${API}/api/merge/sessions/${sessionId}/exit`);
+          }
+        };
 
-  return () => {
-    window.removeEventListener("beforeunload", handleTabClose);
-  };
-}, [sessionId]);
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, [sessionId]);
 
   const startUserSession = async () => {
     try {
@@ -231,14 +234,6 @@ export default function App() {
                 title="Log Out"
               >
                 <LogOut className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={() => setShowExitModal(true)}
-                className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
-                title="Exit"
-              >
-                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
