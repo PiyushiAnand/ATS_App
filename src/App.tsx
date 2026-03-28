@@ -10,7 +10,9 @@ import { Content } from './components/Content';
 import { EngagementCheck } from './components/EngagementCheck';
 import { KNOWLEDGE_COMPONENTS, updateMastery, KC_LAST_ORDER } from './services/bkt';
 import { LearnerState } from './types';
-import { LogOut, User, Bell } from 'lucide-react';
+import { LogOut, User, Bell, X } from 'lucide-react';
+import { Profile } from './components/Profile';
+import { ExitModal } from './components/ExitModal';
 const API = "https://ats-app-2.onrender.com";
 
 export default function App() {
@@ -19,6 +21,8 @@ export default function App() {
   const [activeOrder, setActiveOrder] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
   const [learnerState, setLearnerState] = useState<LearnerState>(() => {
     const initialMastery: Record<string, number> = {};
     KNOWLEDGE_COMPONENTS.forEach(kc => {
@@ -211,15 +215,30 @@ export default function App() {
                 <p className="text-xs text-slate-500">{user.email}</p>
               </div>
 
-              <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center border">
-                <User className="w-6 h-6 text-slate-400" />
-              </div>
+              <button 
+                onClick={() => setShowProfile(true)}
+                className="w-10 h-10 bg-slate-100 hover:bg-indigo-50 rounded-full flex items-center justify-center border hover:border-indigo-200 transition-colors"
+                title="View Profile"
+              >
+                <User className="w-6 h-6 text-slate-400 hover:text-indigo-600" />
+              </button>
+
+              <div className="h-6 w-px bg-slate-200 mx-1" />
 
               <button
-                onClick={handleLogout}
-                className="p-2 text-slate-400 hover:text-rose-500"
+                onClick={() => setShowExitModal(true)}
+                className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                title="Log Out"
               >
                 <LogOut className="w-5 h-5" />
+              </button>
+
+              <button
+                onClick={() => setShowExitModal(true)}
+                className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                title="Exit"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -229,7 +248,9 @@ export default function App() {
 
       {/* MAIN */}
       <main>
-        {activeKC && activeOrder !== null ? (
+        {showProfile ? (
+          <Profile onBack={() => setShowProfile(false)} />
+        ) : activeKC && activeOrder !== null ? (
           <Content
             kcId={activeKC}
             order={activeOrder}
@@ -280,6 +301,14 @@ export default function App() {
       </main>
 
       <EngagementCheck />
+      <ExitModal 
+        isOpen={showExitModal} 
+        onClose={() => setShowExitModal(false)}
+        onConfirm={() => {
+          setShowExitModal(false);
+          handleLogout();
+        }}
+      />
     </div>
   );
 }
