@@ -43,13 +43,14 @@ const getChapterMetadata = async (_req: Request, res: Response) => {
     // 2. Map every lesson across all KCs to the subtopics array
     const subtopics = lessons.map((lesson) => {
       // Clean the subtopic name by removing "Subtopic X:" prefix if it exists
-      const cleanName = (lesson.subtopicName.split(':').pop()?.trim() || lesson.subtopicName)
+      const subtopic_name = (lesson.subtopicName.split(':').pop()?.trim() || lesson.subtopicName)
               .toLowerCase()
               .replace(/[^a-z0-9 ]/g, '')
               .split(' ')
               .join('_');
+      const cleanName = lesson.subtopicName.split(':').pop()?.trim() || lesson.subtopicName;
       return {
-        subtopic_id: `grade6_${cleanName}`,
+        subtopic_id: `grade6_${subtopic_name}`,
         name: `${lesson.kcId}: ${lesson.subtopicName}`,
         difficulty: subtopicDifficultyMap[cleanName] || 0.5, // Fallback to 0.5 if name doesn't match
       };
