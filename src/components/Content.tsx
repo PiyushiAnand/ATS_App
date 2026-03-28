@@ -100,7 +100,12 @@ const TallyAnimation = ({ count = 12 }: { count?: number}) => {
   );
 };
 
-const PictographAnimation = ({ count = 7, icon = "🍎" }: { count?: number; icon?: string }) => {
+import { motion } from "framer-motion";
+
+const PictographAnimation = ({ count = 7.5, icon = "🍎" }: { count?: number; icon?: string }) => {
+  const fullIcons = Math.floor(count);
+  const hasHalf = count % 1 !== 0;
+
   return (
     <div className="p-6 bg-slate-50 border rounded-xl mt-4 shadow-sm">
       <h3 className="font-semibold text-slate-700 mb-3">Pictograph Dataset</h3>
@@ -112,7 +117,8 @@ const PictographAnimation = ({ count = 7, icon = "🍎" }: { count?: number; ico
           show: { transition: { staggerChildren: 0.1 } },
         }}
       >
-        {Array.from({ length: count }).map((_, i) => (
+        {/* Render Full Icons */}
+        {Array.from({ length: fullIcons }).map((_, i) => (
           <motion.span
             key={i}
             variants={{
@@ -125,6 +131,20 @@ const PictographAnimation = ({ count = 7, icon = "🍎" }: { count?: number; ico
             {icon}
           </motion.span>
         ))}
+
+        {/* Render Half Icon if applicable */}
+        {hasHalf && (
+          <motion.span
+            variants={{
+              hidden: { width: 0, opacity: 0 },
+              show: { width: "0.5em", opacity: 1 },
+            }}
+            className="inline-block overflow-hidden whitespace-nowrap cursor-pointer select-none"
+            style={{ width: "0.5em" }} // Cuts the emoji in half
+          >
+            {icon}
+          </motion.span>
+        )}
       </motion.div>
     </div>
   );
