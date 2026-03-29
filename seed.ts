@@ -1,7 +1,7 @@
 import mongoose from "./server/db/mongoose";
 import { Lesson } from "./server/models/Lesson";
 
-const MONGO_URI = "mongodb+srv://piyushianand2128_db_user:cjdjLvrJMDDFMiKB@cluster0.074ksss.mongodb.net/?appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/ats-app-db";
 
 console.log("Using URI:", MONGO_URI);
 const getEmbedUrl = (url) => {
