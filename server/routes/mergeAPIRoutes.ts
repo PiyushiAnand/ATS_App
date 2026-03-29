@@ -105,8 +105,8 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
     const responses = (session.Responses || []) as unknown as IResponse[];
 
     // 1. Calculate uniqueness and tallies using exact IResponse attributes
-    const correct_answers = responses.filter((r) => r.correctness === true).length;
-    const wrong_answers = responses.filter((r) => r.correctness === false).length;
+    // const correct_answers = responses.filter((r) => r.correctness === true).length;
+    // const wrong_answers = responses.filter((r) => r.correctness === false).length;
 
     const uniqueProblemIds = Array.from(new Set(responses.map((r) => r.problemId.toString())));
     const questions_attempted = uniqueProblemIds.length;
@@ -139,8 +139,6 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
       chapter_id: "grade6_data_handling", 
       timestamp: new Date().toISOString(),
       session_status: session_status || (session.endTime ? "completed" : "exited_midway"),
-      correct_answers,
-      wrong_answers,
       questions_attempted,
       total_questions,
       retry_count,
@@ -152,11 +150,11 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
 
     // 3. Validation sanity check
     // 1. correct + wrong <= attempted
-    if ((correct_answers + wrong_answers) > questions_attempted) {
-      return res.status(400).json({ 
-        error: "Validation Failed: Sum of results cannot exceed unique attempts." 
-      });
-    }
+    // if ((correct_answers + wrong_answers) > questions_attempted) {
+    //   return res.status(400).json({ 
+    //     error: "Validation Failed: Sum of results cannot exceed unique attempts." 
+    //   });
+    // }
 
     // 2. attempted <= total
     // total_questions here should represent the total questions available in the chapter

@@ -4,7 +4,7 @@
 BASE_URL="https://ats-app-2.onrender.com/api/merge"
 
 KC_ID="KC1"
-SESSION_ID="69c6c48f30adf203eec3967a" 
+SESSION_ID="69c6c49c30adf203eec3968f" 
 
 # Detect if json_pp is available to pretty-print JSON responses
 PRETTIFY=""
