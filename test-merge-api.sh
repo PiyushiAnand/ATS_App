@@ -19,7 +19,7 @@ echo "=================================================="
 
 # 📍 1. Test Chapter Metadata
 echo -e "\n🔍 [1/3] Testing GET Chapter Metadata for $KC_ID..."
-RESPONSE=$(curl -s -X GET "$BASE_URL/chapters/$KC_ID/metadata" \
+RESPONSE=$(curl -s -X GET "$BASE_URL/chapters/metadata" \
      -H "Content-Type: application/json")
 
 if [ -n "$PRETTIFY" ]; then

@@ -206,7 +206,7 @@ const handleMidwayExit = async (req: Request, res: Response) => {
 // ============================================================================
 // Express Router Bindings
 // ============================================================================
-router.get("/chapters/:kcId/metadata", getChapterMetadata);
+router.get("/chapters/metadata", getChapterMetadata);
 router.post("/sessions/:sessionId/sync", syncSessionInteraction);
 router.post("/sessions/:sessionId/exit", handleMidwayExit);
 
