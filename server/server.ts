@@ -6,7 +6,7 @@ import app from "./app"; // Your express app with your API routes
 dotenv.config();
 
 // Render sets process.env.PORT automatically (usually 10000)
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3001; 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/cognipath";
 
 async function startServer() {
