@@ -3,7 +3,8 @@ import { motion } from 'motion/react';
 import { CheckCircle2, Lock, PlayCircle, Trophy, BarChart3 } from 'lucide-react';
 import { KNOWLEDGE_COMPONENTS, KC_LAST_ORDER } from '../services/bkt';
 import { LearnerState } from '../types';
-const API = "https://ats-app-2.onrender.com";
+// const API = "https://ats-app-2.onrender.com";
+const API = "";
 interface Lesson {
   _id: string;
   kcId: string;

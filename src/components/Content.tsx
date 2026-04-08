@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import ReactConfetti from 'react-confetti';
 import { seedRemedial } from '../data/seedRemedial';
-const API = "https://ats-app-2.onrender.com";
+const API = "";
 const getEmbedUrl = (url) => {
   if (!url) return '';
   if (url.includes('youtu.be/')) {

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { User as UserIcon, Mail, Award, ArrowLeft, Loader2 } from 'lucide-react';
 import { KNOWLEDGE_COMPONENTS } from '../services/bkt';
 
-const API = "https://ats-app-2.onrender.com";
-
+// const API = "https://ats-app-2.onrender.com";
+const API = "";
 interface UserProfile {
   name: string;
   email: string;

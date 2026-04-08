@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { LogIn, UserPlus, GraduationCap, ArrowRight, AlertCircle } from 'lucide-react';
-const API = "https://ats-app-2.onrender.com";
+// const API = "https://ats-app-2.onrender.com";
+const API = "http://localhost:3001";
 interface AuthProps {
   onLogin: (user: { name: string; email: string; mastery: Record<string, number>; completedTopics: string[] }) => void;
 }

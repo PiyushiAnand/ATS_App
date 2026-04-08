@@ -21,7 +21,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin:[ "http://localhost:5173", // Your local React dev server
+    origin:[ 
+      "http://localhost:5173", // Your local React dev server
     "https://ats-frontend-uxub.onrender.com"],
     credentials: true,               // Crucial for HTTP cookies and JWT to pass through!
   })
