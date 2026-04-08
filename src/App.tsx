@@ -14,7 +14,7 @@ import { LogOut, User, Bell} from 'lucide-react';
 import { Profile } from './components/Profile';
 import { ExitModal } from './components/ExitModal';
 // const API = "https://ats-app-2.onrender.com";
-const API = "http://localhost:3001"
+const API = "";
 export default function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [activeKC, setActiveKC] = useState<string | null>(null);
