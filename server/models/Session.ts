@@ -1,21 +1,33 @@
 import mongoose from "../db/mongoose";
 
 const sessionSchema = new mongoose.Schema({
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "User", 
+  // 🔥 Link to external auth system
+  user_id: { 
+    type: String, 
     required: true 
   },
-  externalStudentId: { type: String }, // Store student_id from redirect URL
-  externalSessionId: { type: String }, // Store session_id from redirect URL
+
+  // 🔥 From redirect URL (MANDATORY in your system)
+  student_id: { 
+    type: String, 
+    required: true 
+  },
+
+  session_id: { 
+    type: String, 
+    required: true,
+    unique: true   // ✅ prevents duplicate submissions
+  },
+
   startTime: { type: Date, default: Date.now },
   endTime: { type: Date },
-  // 📂 Links to all the quizzes they took in this one sitting!
-  Responses: [{
+
+  // 📂 Quiz responses inside this session
+  responses: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Response"
   }]
-}, { timestamps: true });
 
+}, { timestamps: true });
 
 export const Session = mongoose.model("Session", sessionSchema);
