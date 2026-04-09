@@ -29,7 +29,8 @@ router.post("/start", authenticate, async (req: AuthRequest, res: Response) => {
         session_id: session.session_id
       });
     }
-
+    console.log("✨ Creating new session with ID:", session_id);
+    console.log("Session details:", { user_id, student_id, session_id });
     // ✅ Create new session
     session = await Session.create({
       user_id,
