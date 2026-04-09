@@ -235,28 +235,29 @@ export default function App() {
   }, []);
 
   // ✅ SYNC TO BACKEND
-  useEffect(() => {
-    if (!user) return;
+useEffect(() => {
+  if (!user) return;
 
-    const syncState = async () => {
-      try {
-        await safeFetch(`${API}/api/user/state`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            mastery: learnerState.mastery,
-            completedTopics: learnerState.completedTopics
-          }),
-        });
-      } catch (err) {
-        console.error("State sync failed", err);
-      }
-    };
+  const syncState = async () => {
+    try {
+      await safeFetch(`${API}/api/user/state`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mastery: learnerState.mastery,
+          completedTopics: learnerState.completedTopics,
+        }),
+      });
+    } catch (err) {
+      console.error("State sync failed", err);
+    }
+  };
 
-    const timeoutId = setTimeout(syncState, 2000);
-    return () => clearTimeout(timeoutId);
-  }, [learnerState, user]);
+  const timeoutId = setTimeout(syncState, 2000);
+  return () => clearTimeout(timeoutId);
+}, [learnerState, user]);
 
   // ✅ LOGIN
   const handleLogin = (userData: any) => {

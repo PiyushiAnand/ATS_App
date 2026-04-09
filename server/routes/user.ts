@@ -41,6 +41,7 @@ router.post("/state", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     // Notice I removed 'mastery' from the update payload. 
     // Mastery should ONLY be updated by your BKT algorithm when a student submits an answer.
+    console.log("Updating completed topics for user:", req.userId, "New completed topics:", completedTopics);
     await User.findByIdAndUpdate(req.userId, { completedTopics });
     res.json({ success: true });
   } catch (err: any) {
