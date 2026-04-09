@@ -6,7 +6,7 @@ import { Content } from "./server/models/Content";
 
 dotenv.config();
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/ats-app-db";
+const MONGO_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/ats-app-db";
 
 // All KC1 Questions extracted precisely from ET605 Project.pdf with Animations!
 const kc1Assessments = [
