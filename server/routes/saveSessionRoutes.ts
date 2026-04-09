@@ -12,7 +12,8 @@ router.post("/start", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const user_id = req.userId; 
     const { session_id, student_id } = req.body;
-
+    console.log("✨ Creating new session with ID:", session_id);
+    console.log("Session details:", { user_id, student_id, session_id });
     if (!user_id || !session_id || !student_id) {
       return res.status(400).json({ 
         error: "user_id, session_id, and student_id are required." 
@@ -29,8 +30,7 @@ router.post("/start", authenticate, async (req: AuthRequest, res: Response) => {
         session_id: session.session_id
       });
     }
-    console.log("✨ Creating new session with ID:", session_id);
-    console.log("Session details:", { user_id, student_id, session_id });
+  
     // ✅ Create new session
     session = await Session.create({
       user_id,
