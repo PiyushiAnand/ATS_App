@@ -26,7 +26,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
     if (!question) return res.status(404).json({ error: "Question not found" });
 
     const isCorrect = question.correctAnswer === selectedOption;
-
+    console.log(`User answered ${isCorrect ? "correctly" : "incorrectly"}. Selected: ${selectedOption}, Correct: ${question.correctAnswer}`);
     // 2. Save the student's response interaction
     const newResponse = new Response({
       user_id: req.userId,
