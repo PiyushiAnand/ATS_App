@@ -28,6 +28,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
     const isCorrect = question.correctAnswer === selectedOption;
     console.log(`User answered ${isCorrect ? "correctly" : "incorrectly"}. Selected: ${selectedOption}, Correct: ${question.correctAnswer}`);
     // 2. Save the student's response interaction
+    console.log("session_id in request body:", session_id);
     const newResponse = new Response({
       user_id: req.userId,
       problemId: questionId,
