@@ -97,12 +97,12 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
     const { session_status } = req.body; 
 
     // Find the session and pull the actual question documents
-    const session = await Session.findById(sessionId).populate("Responses");
+    const session = await Session.findOne({ session_id: sessionId }).populate("responses");
     if (!session) {
-      return res.status(404).json({ error: "User session context not found." });
+      return res.status(404).json({ error: "User session context not found for ID: " + sessionId });
     }
 
-    const responses = (session.Responses || []) as unknown as IResponse[];
+    const responses = (session.responses || []) as unknown as IResponse[];
 
     // 1. Calculate uniqueness and tallies using exact IResponse attributes
     // const correct_answers = responses.filter((r) => r.correctness === true).length;
@@ -128,14 +128,14 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
     const time_spent_seconds = responses.reduce((sum, r) => sum + (r.timeTaken || NaN), 0);
 
     // 🎯 Real Dynamic Topic Completion Ratio
-    const user = await User.findById(session.userId);
+    const user = await User.findOne({ user_id: session.user_id });
     const completedTopicsCount = user?.completedTopics?.length || NaN;
     const topic_completion_ratio = Number((completedTopicsCount / 13).toFixed(2));
 
     // 2. Map schema terms to exact Merge contract field types
     const sessionPayload = {
-      student_id: (session as any).externalStudentId || session.userId.toString(), 
-      session_id: (session as any).externalSessionId || session._id.toString(), // Unique reusable ID for safe idempotent network retries
+      student_id: (session as any).externalStudentId || session.student_id, 
+      session_id: (session as any).externalSessionId || session.session_id, // Unique reusable ID for safe idempotent network retries
       chapter_id: "grade6_data_handling", 
       timestamp: new Date().toISOString(),
       session_status: session_status || (session.endTime ? "completed" : "exited_midway"),
@@ -187,9 +187,9 @@ const handleMidwayExit = async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
 
-    const session = await Session.findById(sessionId);
+    const session = await Session.findOne({ session_id: sessionId });
     if (!session) {
-      return res.status(404).json({ error: "Session context could not be found." });
+      return res.status(404).json({ error: "Session context could not be found for ID: " + sessionId });
     }
 
     // Wrap-up metrics for the whole sitting session

@@ -1,13 +1,13 @@
-import express from "express";
+import express, { Response as ExResponse } from "express";
 import { Response } from "../models/Response.ts";
 import { Content } from "../models/Content.ts";
 import { User } from "../models/User.ts";
 import { AssessmentAttempt } from "../models/AssessmentAttempt.ts";
-import { authenticate } from "../middleware/auth.ts";
+import { authenticate, AuthRequest } from "../middleware/auth.ts";
 
 const router = express.Router();
 
-router.post("/submit", authenticate, async (req, res) => {
+router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) => {
   const { 
     attemptId, 
     questionId, 
@@ -16,7 +16,7 @@ router.post("/submit", authenticate, async (req, res) => {
     timeTaken, 
     hintCount, 
     attemptCount,
-    sessionId
+    session_id
   } = req.body;
 
   try {
@@ -28,14 +28,14 @@ router.post("/submit", authenticate, async (req, res) => {
 
     // 2. Save the student's response interaction
     const newResponse = new Response({
-      userId: req.userId,
+      user_id: req.userId,
       problemId: questionId,
       kcId,
       correctness: isCorrect,
       timeTaken,
       hintTaken: hintCount > 0, // Convert hintCount to a boolean for backward compatibility
       attemptCount,
-      sessionId
+      session_id: session_id
     });
     await newResponse.save();
 
@@ -47,7 +47,7 @@ router.post("/submit", authenticate, async (req, res) => {
     }
 
     // 3. BAYESIAN KNOWLEDGE TRACING (BKT) MASTERY UPDATE
-    const user = await User.findById(req.userId);
+    const user = await User.findOne({ user_id: req.userId });
     if (!user) return res.status(404).json({ error: "User not found" });
 
     // Initial P values per KC (LLM generated)

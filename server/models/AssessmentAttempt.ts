@@ -1,9 +1,8 @@
 import mongoose from "../db/mongoose";
 
 const assessmentAttemptSchema = new mongoose.Schema({
-  userId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "User", 
+  user_id: { 
+    type: String, 
     required: true 
   },
   assessmentId: { 

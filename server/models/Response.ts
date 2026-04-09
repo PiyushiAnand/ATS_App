@@ -3,8 +3,8 @@ import { Document, Schema, Model, Types } from "mongoose";
 
 // 1. Define the TypeScript Interface for the Response Document
 export interface IResponse extends Document {
-  userId: Types.ObjectId; // Reference to the User
-  sessionId: Types.ObjectId;
+  user_id: string; // Reference to the User (External ID)
+  session_id: string;
   problemId: Types.ObjectId; // Reference to the Content (Question)
   kcId: "KC1" | "KC2" | "KC3"; // The specific Knowledge Component being tested
   correctness: boolean; // True if the student got it right, False if wrong
@@ -18,14 +18,12 @@ export interface IResponse extends Document {
 // 2. Create the Mongoose Schema
 const responseSchema: Schema<IResponse> = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    user_id: {
+      type: String,
       required: true,
     },
-    sessionId: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "Session", 
+    session_id: { 
+      type: String, 
       required: true 
     },
     problemId: {
