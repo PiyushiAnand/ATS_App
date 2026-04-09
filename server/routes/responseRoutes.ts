@@ -38,7 +38,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
       session_id: session_id
     });
     await newResponse.save();
-
+    console.log("New response saved:", newResponse);
     // Link this response to the active Assessment Attempt
     if (attemptId) {
       await AssessmentAttempt.findByIdAndUpdate(attemptId, {
@@ -49,7 +49,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
     // 3. BAYESIAN KNOWLEDGE TRACING (BKT) MASTERY UPDATE
     const user = await User.findOne({ user_id: req.userId });
     if (!user) return res.status(404).json({ error: "User not found" });
-
+    console.log("User found:", user);
     // Initial P values per KC (LLM generated)
     const kcParams = {
       "KC1": { P_L0: 0.35, P_T: 0.20, P_G: 0.25, P_S: 0.10 },
@@ -119,6 +119,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
     newMastery = Math.max(0.01, Math.min(0.99, newMastery));
 
     // Update the User document
+    console.log(`Updating mastery for ${kcId}: ${currentMastery.toFixed(4)} -> ${newMastery.toFixed(4)}`);
     user.mastery.set(kcId, newMastery);
     await user.save();
 
