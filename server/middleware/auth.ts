@@ -23,6 +23,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     const decoded = jwt.decode(token);
 
     if (!decoded) {
+      console.log("JWT DECODE FAILED for token:", token);
       return res.status(401).json({ error: "Invalid token" });
     }
 
