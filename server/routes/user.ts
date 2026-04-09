@@ -7,19 +7,28 @@ const router = express.Router();
 // 1. Get Current User Profile
 router.get("/me", authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const user = await User.findById(req.userId);
+    // 🔥 Use user_id instead of _id
+    let user = await User.findOne({ user_id: req.userId });
+
+    // 🔥 Auto-create user if not found (recommended)
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      user = await User.create({
+        user_id: req.userId,
+        mastery: {},
+        completedTopics: []
+      });
     }
-    
-    // Successfully return the data
+
+    // ✅ Return safe response
     res.json({ 
-      name: user.name, 
-      email: user.email, 
-      mastery: user.mastery, 
-      completedTopics: user.completedTopics 
+      name: user.name || "", 
+      email: user.email || "", 
+      mastery: user.mastery || {}, 
+      completedTopics: user.completedTopics || [] 
     });
+
   } catch (err: any) {
+    console.error("GET /me ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
