@@ -20,6 +20,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
   } = req.body;
 
   try {
+    console.log("Processing response submission for user:", req.userId);
     // 1. Fetch the actual question to check the correct answer
     const question = await Content.findById(questionId);
     if (!question) return res.status(404).json({ error: "Question not found" });
