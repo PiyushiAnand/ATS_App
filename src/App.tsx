@@ -406,7 +406,7 @@ export default function App() {
       {/* MAIN */}
       <main>
         {showProfile ? (
-          <Profile onBack={() => setShowProfile(false)} />
+          <Profile onBack={() => setShowProfile(false)} safeFetch={safeFetch} />
         ) : activeKC && activeOrder !== null ? (
           <Content
             kcId={activeKC}
@@ -450,6 +450,7 @@ export default function App() {
         ) : (
           <Pathway
             learnerState={learnerState}
+            safeFetch={safeFetch}
             onSelectTopic={(kcId, order) => {
               setActiveKC(kcId);
               setActiveOrder(order);

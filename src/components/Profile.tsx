@@ -13,9 +13,10 @@ interface UserProfile {
 
 interface ProfileProps {
   onBack: () => void;
+  safeFetch: (url: string, options?: any) => Promise<Response>;
 }
 
-export function Profile({ onBack }: ProfileProps) {
+export function Profile({ onBack, safeFetch }: ProfileProps) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export function Profile({ onBack }: ProfileProps) {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch(`${API}/api/user/me`, {
+        const response = await safeFetch(`${API}/api/user/me`, {
           credentials: 'include'
         });
 

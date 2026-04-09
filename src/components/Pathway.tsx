@@ -15,9 +15,10 @@ interface Lesson {
 interface PathwayProps {
   learnerState: LearnerState;
   onSelectTopic: (kcId: string, order: number) => void;
+  safeFetch: (url: string, options?: any) => Promise<Response>;
 }
 
-export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic }) => {
+export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic, safeFetch }) => {
   const [lessonsMap, setLessonsMap] = useState<Record<string, Lesson[]>>({});
   const [masteryState, setMasteryState] = useState(learnerState.mastery);
   const [completedTopicsState, setCompletedTopicsState] = useState(
@@ -31,7 +32,7 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
 
       for (const kc of KNOWLEDGE_COMPONENTS) {
         try {
-          const res = await fetch(`${API}/api/lessons/${kc.id}`, {
+          const res = await safeFetch(`${API}/api/lessons/${kc.id}`, {
             credentials: 'include',
           });
           console.log(`Fetching lessons for ${kc.id}, status:`, res.status);
@@ -53,7 +54,7 @@ export const Pathway: React.FC<PathwayProps> = ({ learnerState, onSelectTopic })
 
   const fetchMastery = async () => { 
     try { 
-      const res = await fetch(`${API}/api/mastery/get_mastery`, { credentials: 'include', }); 
+      const res = await safeFetch(`${API}/api/mastery/get_mastery`, { credentials: 'include', }); 
     if (!res.ok) throw new Error('Failed to fetch mastery'); 
     const data = await res.json(); console.log("MASTERYYYY:", data); 
     setMasteryState(data.mastery || {}); setCompletedTopicsState(data.completedTopics || []); 
