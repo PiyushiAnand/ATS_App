@@ -813,19 +813,23 @@ export const Content: React.FC<ContentProps> = ({
   useEffect(() => {
     const fetchLesson = async () => {
       try {
-        const res = await fetch(`${API}/api/lessons/${kcId}/${order}`, {
-          credentials: 'include',
+        const res = await safeFetch(`${API}/api/lessons/${kcId}/${order}`, {
+          method: "GET",
         });
 
         if (!res.ok) throw new Error('Failed to fetch lesson');
 
         const data = await res.json();
         const lessonId = data._id;
+
         console.log(data);
+
         let questions: Question[] = [];
+
         if (lessonId) {
-          const assessRes = await fetch(`${API}/api/assessments/lesson/${lessonId}`, {
-            credentials: 'include',
+          // ✅ Use safeFetch here too
+          const assessRes = await safeFetch(`${API}/api/assessments/lesson/${lessonId}`, {
+            method: "GET",
           });
 
           if (assessRes.ok) {
