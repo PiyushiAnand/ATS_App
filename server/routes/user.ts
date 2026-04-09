@@ -43,7 +43,7 @@ router.post("/state", authenticate, async (req: AuthRequest, res: Response) => {
     // Mastery should ONLY be updated by your BKT algorithm when a student submits an answer.
     console.log("Updating completed topics for user:", req.userId, "New completed topics:", completedTopics);
     await User.findOneAndUpdate(
-      { _id: String(req.userId) },
+      { user_id: String(req.userId) },
       { $set: { completedTopics } }
     );
     res.json({ success: true });
