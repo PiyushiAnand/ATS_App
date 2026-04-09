@@ -45,6 +45,7 @@ router.post("/state", authenticate, async (req: AuthRequest, res: Response) => {
     await User.findByIdAndUpdate(req.userId, { completedTopics });
     res.json({ success: true });
   } catch (err: any) {
+    console.error("POST /state ERROR:", err);
     res.status(400).json({ error: err.message });
   }
 });
