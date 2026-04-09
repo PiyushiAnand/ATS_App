@@ -16,7 +16,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
     timeTaken, 
     hintCount, 
     attemptCount,
-    session_id
+    sessionId
   } = req.body;
 
   try {
@@ -28,7 +28,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
     const isCorrect = question.correctAnswer === selectedOption;
     console.log(`User answered ${isCorrect ? "correctly" : "incorrectly"}. Selected: ${selectedOption}, Correct: ${question.correctAnswer}`);
     // 2. Save the student's response interaction
-    console.log("session_id in request body:", session_id);
+    console.log("session_id in request body:", sessionId);
     const newResponse = new Response({
       user_id: req.userId,
       problemId: questionId,
@@ -37,7 +37,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
       timeTaken,
       hintTaken: hintCount > 0, // Convert hintCount to a boolean for backward compatibility
       attemptCount,
-      session_id: session_id
+      session_id: sessionId
     });
     await newResponse.save();
     console.log("New response saved:", newResponse);
