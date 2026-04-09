@@ -13,8 +13,22 @@ import { LearnerState } from './types';
 import { LogOut, User, Bell} from 'lucide-react';
 import { Profile } from './components/Profile';
 import { ExitModal } from './components/ExitModal';
-// const API = "https://ats-app-2.onrender.com";
 const API = "";
+
+// Helper to get session info from storage or URL
+const getSessionInfo = () => {
+  const params = new URLSearchParams(window.location.search);
+  
+  const token = params.get("token") || sessionStorage.getItem("token");
+  const student_id = params.get("student_id") || sessionStorage.getItem("student_id");
+  const session_id = params.get("session_id") || sessionStorage.getItem("session_id");
+
+  if (params.get("token")) sessionStorage.setItem("token", params.get("token") || "");
+  if (params.get("student_id")) sessionStorage.setItem("student_id", params.get("student_id") || "");
+  if (params.get("session_id")) sessionStorage.setItem("session_id", params.get("session_id") || "");
+
+  return { token, student_id, session_id };
+};
 export default function App() {
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
   const [activeKC, setActiveKC] = useState<string | null>(null);
@@ -106,6 +120,15 @@ export default function App() {
       } catch (e) { /* Not JSON */ }
     }
 
+    // 2. Inject Authorization Header if token exists
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+      };
+    }
+
     try {
       const response = await fetch(url, options);
       if (!response.ok && response.status >= 500) {
@@ -147,12 +170,17 @@ export default function App() {
       }, [sessionId]);
 
   const startUserSession = async () => {
+    const { student_id, session_id } = getSessionInfo();
+    
     try {
       const response = await safeFetch(`${API}/api/session/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ sessionId }) // Send existing sessionId if we have it (idempotency)
+        body: JSON.stringify({ 
+          sessionId: session_id || sessionId, // Prefer external session_id
+          studentId: student_id 
+        }) 
       });
       if (response.ok) {
         const data = await response.json();
@@ -166,10 +194,15 @@ export default function App() {
   // ✅ AUTH CHECK
   useEffect(() => {
     const checkAuth = async () => {
+      const { token } = getSessionInfo();
+      
       try {
-        const response = await fetch(`${API}/api/user/me`, {
-          credentials: 'include'
-        });
+        const fetchOptions: any = { credentials: 'include' };
+        if (token) {
+          fetchOptions.headers = { 'Authorization': `Bearer ${token}` };
+        }
+
+        const response = await fetch(`${API}/api/user/me`, fetchOptions);
 
         if (response.ok) {
           const data = await response.json();
@@ -246,6 +279,12 @@ export default function App() {
       method: 'POST',
       credentials: 'include'
     });
+    
+    // Clear session storage for one-time auth
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("student_id");
+    sessionStorage.removeItem("session_id");
+    
     setUser(null);
     setSessionId(null); // Reset
   };
@@ -282,8 +321,29 @@ export default function App() {
 
   // ✅ NOT LOGGED IN
   if (!user) {
-    return <Auth onLogin={handleLogin} />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl shadow-slate-200/60 p-8 text-center border border-slate-100">
+          <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <LogOut className="w-8 h-8 text-rose-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Denied</h2>
+          <p className="text-slate-600 mb-8">
+            Please access this chapter through your student dashboard.
+          </p>
+          <div className="p-4 bg-slate-50 rounded-xl text-sm text-slate-500 text-left border border-slate-100">
+            <p className="font-medium text-slate-700 mb-1">Missing Session Info:</p>
+            <ul className="list-disc list-inside space-y-1">
+              {!sessionStorage.getItem("token") && <li>Authentication Token</li>}
+              {!sessionStorage.getItem("student_id") && <li>Student ID</li>}
+              {!sessionStorage.getItem("session_id") && <li>Session ID</li>}
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
   }
+
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">

@@ -134,8 +134,8 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
 
     // 2. Map schema terms to exact Merge contract field types
     const sessionPayload = {
-      student_id: session.userId.toString(), 
-      session_id: session._id.toString(), // Unique reusable ID for safe idempotent network retries
+      student_id: (session as any).externalStudentId || session.userId.toString(), 
+      session_id: (session as any).externalSessionId || session._id.toString(), // Unique reusable ID for safe idempotent network retries
       chapter_id: "grade6_data_handling", 
       timestamp: new Date().toISOString(),
       session_status: session_status || (session.endTime ? "completed" : "exited_midway"),

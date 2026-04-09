@@ -32,6 +32,8 @@ router.post("/start", authenticate, async (req: AuthRequest, res: Response) => {
 
     const newSession = new Session({
       userId,
+      externalStudentId: req.body.studentId, // From frontend getSessionInfo()
+      externalSessionId: req.body.sessionId, // From frontend getSessionInfo()
       Responses: [] 
     });
 
