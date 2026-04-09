@@ -169,28 +169,36 @@ export default function App() {
         };
       }, [sessionId]);
 
-  const startUserSession = async () => {
-    const { student_id, session_id } = getSessionInfo();
-    
-    try {
-      const response = await safeFetch(`${API}/api/session/start`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ 
-          sessionId: session_id || sessionId, // Prefer external session_id
-          studentId: student_id 
-        }) 
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSessionId(data.sessionId);
-        console.log("📍 Tracking Session Activated:", data.sessionId);
-      }
-    } catch (err) {
-      console.error("Failed to start session metrics", err);
+ const startUserSession = async () => {
+  const { student_id, session_id } = getSessionInfo();
+
+  if (!student_id || !session_id) {
+    console.error("Missing student_id or session_id");
+    return;
+  }
+
+  try {
+    const response = await safeFetch(`${API}/api/session/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: session_id,   // ✅ ALWAYS use external session_id
+        student_id: student_id    // ✅ REQUIRED
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // You can still store if backend returns something new
+      setSessionId(data.session_id || session_id);
+
+      console.log("📍 Session started:", data.session_id || session_id);
     }
-  };
+  } catch (err) {
+    console.error("Failed to start session", err);
+  }
+};
   // ✅ AUTH CHECK
   useEffect(() => {
     const checkAuth = async () => {
