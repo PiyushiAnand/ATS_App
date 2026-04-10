@@ -236,16 +236,14 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
     }
 
     // 1. Fetch session + responses
-    const session = await Session.findOne({ session_id }).populate("responses");
+    const session = await Session.findOne({ session_id });
+    const responses = await UserResponse.find({ session_id });
 
     if (!session) {
       return res.status(404).json({
         error: "Session not found."
       });
     }
-
-    const responses = (session.responses || []) as unknown as IResponse[];
-
     if (responses.length === 0) {
       return res.status(404).json({
         message: "No responses found for this session."
