@@ -331,7 +331,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
       session_status: "completed",
 
       correct_answers,
-      wrong_answers,
+      wrong_answers: 0,
       questions_attempted,
       total_questions,
       retry_count,
