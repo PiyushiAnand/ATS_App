@@ -230,7 +230,7 @@ router.post("/start", authenticate, async (req: AuthRequest, res: Response) => {
 router.post("/complete", authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const { session_id, token } = req.body;
-
+    console.log("🔔 Completing session with ID:", session_id);
     if (!session_id) {
       return res.status(400).json({ error: "session_id is required." });
     }
@@ -325,7 +325,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
     // 5. FINAL PAYLOAD (matches recommendation API contract)
     const payload = {
       student_id: updatedSession.student_id,
-      session_id: updatedSession.session_id,
+      session_id: session_id,
       chapter_id: "grade6_data_handling_and_probability",
       timestamp: new Date().toISOString(),
       session_status: "completed",
@@ -364,6 +364,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
       console.error("Recommendation API error:", err.message);
     }
 
+    console.log("Payload sent:", payload);
     console.log("🏁 Session completed + recommendation generated:", session_id);
 
     // 7. RESPONSE
