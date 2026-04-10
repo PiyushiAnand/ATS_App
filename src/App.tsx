@@ -285,7 +285,8 @@ const handleLogout = async () => {
         },
         credentials: 'include',
         body: JSON.stringify({
-          session_id: sessionId   // ✅ FIXED KEY
+          session_id: sessionId ,  // ✅ FIXED KEY
+          token: token           
         })
       });
 
