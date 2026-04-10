@@ -288,24 +288,24 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
     );
 
     // 4. VALIDATIONS
-    if (correct_answers + wrong_answers !== questions_attempted) {
-      return res.status(400).json({ error: "Validation failed: correctness mismatch." });
-    }
-
     if (questions_attempted > total_questions) {
-      return res.status(400).json({ error: "Validation failed: attempted > total." });
+      return res.status(400).json({ 
+        error: "Validation Failed: Attempted count exceeds total available questions." 
+      });
     }
 
-    if (retry_count > questions_attempted) {
-      return res.status(400).json({ error: "Validation failed: retry_count invalid." });
-    }
-
+    // 3. hints_used <= total_hints
     if (hints_used > total_hints_embedded) {
-      return res.status(400).json({ error: "Validation failed: hints_used exceeds total." });
+      return res.status(400).json({ 
+        error: "Validation Failed: Used hints count cannot exceed available hints." 
+      });
     }
 
+    //check if topic_completion_ratio is between 0 and 1
     if (topic_completion_ratio < 0 || topic_completion_ratio > 1) {
-      return res.status(400).json({ error: "Validation failed: topic_completion_ratio out of range." });
+      return res.status(400).json({ 
+        error: "Validation Failed: Topic completion ratio must be between 0 and 1." 
+      });
     }
 
     // 5. BUILD PAYLOAD
