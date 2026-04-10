@@ -272,31 +272,49 @@ useEffect(() => {
   };
 
   // ✅ LOGOUT
-  const handleLogout = async () => {
-
+const handleLogout = async () => {
+  try {
     if (sessionId) {
-        await safeFetch(`${API}/api/session/complete`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ sessionId })
-        });
-        console.log("🏁 Session closed successfully.");
+      const token = sessionStorage.getItem("token");
+
+      const res = await safeFetch(`${API}/api/session/complete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          session_id: sessionId   // ✅ FIXED KEY
+        })
+      });
+
+      const data = await res?.json?.();
+
+      console.log("🏁 Session closed successfully.");
+
+      // Optional: show recommendation immediately
+      if (data?.recommendation) {
+        console.log("📊 Recommendation:", data.recommendation);
+      }
     }
 
     await fetch(`${API}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });
-    
-    // Clear session storage for one-time auth
+
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("student_id");
     sessionStorage.removeItem("session_id");
-    
+
     setUser(null);
-    setSessionId(null); // Reset
-  };
+    setSessionId(null);
+
+  } catch (err) {
+    console.error("Logout/session complete failed:", err);
+  }
+};
 
   // ✅ BKT UPDATE
   const handleAnswer = (isCorrect: boolean) => {
