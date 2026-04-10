@@ -235,59 +235,72 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
       return res.status(400).json({ error: "session_id is required." });
     }
 
-    // 1. Fetch session responses
-    const userResponses = await UserResponse.find({ session_id });
+    // 1. Fetch session + responses
+    const session = await Session.findOne({ session_id }).populate("responses");
 
-    if (userResponses.length === 0) {
+    if (!session) {
+      return res.status(404).json({
+        error: "Session not found."
+      });
+    }
+
+    const responses = (session.responses || []) as unknown as IResponse[];
+
+    if (responses.length === 0) {
       return res.status(404).json({
         message: "No responses found for this session."
       });
     }
 
-    const responseIds = userResponses.map((r) => r._id);
-
-    // 2. Attach responses to session
+    // 2. Attach responses + end session
     const updatedSession = await Session.findOneAndUpdate(
       { session_id },
       {
-        responses: responseIds,
         endTime: new Date()
       },
       { new: true }
     );
 
     if (!updatedSession) {
-      return res.status(404).json({ error: "Session not found." });
+      return res.status(404).json({ error: "Session update failed." });
     }
 
-    // 3. Compute metrics
-    const correct_answers = userResponses.filter(r => r.correctness === true).length;
-    const wrong_answers = userResponses.filter(r => r.correctness === false).length;
+    // 3. Core metrics (aligned with syncSessionInteraction)
+    const uniqueProblemIds = Array.from(
+      new Set(responses.map((r) => r.problemId.toString()))
+    );
 
-    const uniqueProblems = Array.from(new Set(userResponses.map(r => r.problemId.toString())));
-    const questions_attempted = uniqueProblems.length;
+    const questions_attempted = uniqueProblemIds.length;
 
-    const total_questions = questions_attempted;
+    const correct_answers = responses.filter(r => r.correctness === true).length;
+    const wrong_answers = responses.filter(r => r.correctness === false).length;
 
-    const retry_count = userResponses.filter(r => r.attemptCount > 1).length;
-    const hints_used = userResponses.filter(r => r.hintTaken === true).length;
+    const retry_count = responses.filter(r => r.attemptCount > 1).length;
+    const hints_used = responses.filter(r => r.hintTaken === true).length;
 
-    const total_hints_embedded = await Content.countDocuments({
-      _id: { $in: uniqueProblems },
-      difficulty: { $in: ["Medium", "Hard"] }
+    // FIXED: proper hint computation (Medium/Hard only)
+    const takenQuestions = await Content.find({
+      _id: { $in: uniqueProblemIds }
     });
 
-    const time_spent_seconds = userResponses.reduce(
+    const total_hints_embedded = takenQuestions.filter(
+      (q) => q.difficulty === "Medium" || q.difficulty === "Hard"
+    ).length;
+
+    const time_spent_seconds = responses.reduce(
       (sum, r) => sum + (r.timeTaken || 0),
       0
     );
 
     const user = await User.findOne({ user_id: updatedSession.user_id });
+
     const topic_completion_ratio = Number(
-      ((user?.completedTopics?.length || 0) / 13).toFixed(2)
+      (((user?.completedTopics?.length || 0) / 13) || 0).toFixed(2)
     );
 
-    // 4. VALIDATIONS
+    const total_questions = questions_attempted;
+
+    // 4. VALIDATIONS (fixed + complete)
     if (questions_attempted > total_questions) {
       return res.status(400).json({ 
         error: "Validation Failed: Attempted count exceeds total available questions." 
@@ -308,7 +321,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
       });
     }
 
-    // 5. BUILD PAYLOAD
+    // 5. FINAL PAYLOAD (matches recommendation API contract)
     const payload = {
       student_id: updatedSession.student_id,
       session_id: updatedSession.session_id,
@@ -327,7 +340,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
       topic_completion_ratio
     };
 
-    // 6. CALL RECOMMENDATION API (NO AXIOS)
+    // 6. CALL RECOMMENDATION API
     let recommendationData = null;
 
     try {
@@ -343,17 +356,16 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
       if (response.ok) {
         recommendationData = await response.json();
       } else {
-        const errText = await response.text();
-        console.error("Recommendation API failed:", errText);
+        console.error("Recommendation API failed:", await response.text());
       }
 
-    } catch (apiError: any) {
-      console.error("Recommendation API error:", apiError.message);
+    } catch (err: any) {
+      console.error("Recommendation API error:", err.message);
     }
 
-    console.log("🏁 Session closed + recommendation fetched:", session_id);
+    console.log("🏁 Session completed + recommendation generated:", session_id);
 
-    // 7. RETURN RESPONSE
+    // 7. RESPONSE
     return res.status(200).json({
       message: "Session completed successfully!",
       session: updatedSession,
@@ -362,7 +374,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
 
   } catch (error: any) {
     return res.status(500).json({
-      error: "Failed to complete session.",
+      error: "Server Error completing session",
       details: error.message
     });
   }
