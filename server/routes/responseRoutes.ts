@@ -2,6 +2,7 @@ import express, { Response as ExResponse } from "express";
 import { Response } from "../models/Response.ts";
 import { Content } from "../models/Content.ts";
 import { User } from "../models/User.ts";
+import { Session } from "../models/Session.ts";
 import { AssessmentAttempt } from "../models/AssessmentAttempt.ts";
 import { authenticate, AuthRequest } from "../middleware/auth.ts";
 
@@ -48,6 +49,14 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
       });
     }
 
+    // 🔥 NEW: Link this response to the active Session
+    if (sessionId) {
+      await Session.findOneAndUpdate({ session_id: sessionId }, {
+        $push: { responses: newResponse._id }
+      });
+      console.log(`Linked response ${newResponse._id} to session ${sessionId}`);
+    }
+
     // 3. BAYESIAN KNOWLEDGE TRACING (BKT) MASTERY UPDATE
     const user = await User.findOne({ user_id: req.userId });
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -60,13 +69,10 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
     };
 
     // Safely fallback just in case a new KC is passed later
-    const params = kcParams[kcId] || { P_L0: 0.25, P_T: 0.20, P_G: 0.20, P_S: 0.10 };
+    const params = (kcParams as any)[kcId] || { P_L0: 0.25, P_T: 0.20, P_G: 0.20, P_S: 0.10 };
 
     // Fetch current mastery, or initialize with P(L0) if they've never attempted this KC
-    let currentMastery = user.mastery.get(kcId);
-    if (currentMastery === undefined) {
-      currentMastery = params.P_L0;
-    }
+    let currentMastery: number = user.mastery.get(kcId) ?? params.P_L0;
 
     // Load the specific BKT parameters for this KC
     const P_T = params.P_T;
@@ -133,7 +139,7 @@ router.post("/submit", authenticate, async (req: AuthRequest, res: ExResponse) =
       newMasteryLevel: newMastery
     });
 
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });

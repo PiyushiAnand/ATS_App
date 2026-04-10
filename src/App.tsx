@@ -13,6 +13,7 @@ import { LearnerState } from './types';
 import { LogOut, User, Bell} from 'lucide-react';
 import { Profile } from './components/Profile';
 import { ExitModal } from './components/ExitModal';
+import { RecommendationModal } from './components/RecommendationModal';
 const API = "";
 
 // Helper to get session info from storage or URL
@@ -37,6 +38,7 @@ export default function App() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [showProfile, setShowProfile] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [recommendationData, setRecommendationData] = useState<any>(null);
   const [learnerState, setLearnerState] = useState<LearnerState>(() => {
     const initialMastery: Record<string, number> = {};
     KNOWLEDGE_COMPONENTS.forEach(kc => {
@@ -149,25 +151,31 @@ export default function App() {
     window.addEventListener('online', retryFailedRequests);
     return () => window.removeEventListener('online', retryFailedRequests);
   }, []);
-      useEffect(() => {
-        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-          if (sessionId) {
-            // 1. This triggers the native browser "Leave site?" popup
-            e.preventDefault();
-            e.returnValue = ''; // Standard requirement for modern browsers
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // ✅ Use sessionId from state OR from sessionStorage as ultimate fallback
+      const activeSessionId = sessionId || sessionStorage.getItem("session_id");
+      
+      if (activeSessionId) {
+        console.log("🚦 Midway exit triggered for session:", activeSessionId);
+        
+        // 1. Standard requirement for modern browsers
+        e.preventDefault();
+        e.returnValue = ''; 
 
-            // 2. Fire the beacon to mark the session as exited midway
-            // Note: This fires as soon as the tab starts closing
-            navigator.sendBeacon(`${API}/api/merge/sessions/${sessionId}/exit`);
-          }
-        };
+        // 2. Fire the beacon to mark the session as exited midway
+        const beaconUrl = `${API}/api/merge/sessions/${activeSessionId}/exit`;
+        const success = navigator.sendBeacon(beaconUrl);
+        console.log(`📡 Beacon sent to ${beaconUrl}: ${success ? '✅' : '❌'}`);
+      }
+    };
 
-        window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
-        return () => {
-          window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-      }, [sessionId]);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [sessionId]);
 
  const startUserSession = async () => {
   const { student_id, session_id } = getSessionInfo();
@@ -294,29 +302,40 @@ const handleLogout = async () => {
 
       console.log("🏁 Session closed successfully.");
 
-      // Optional: show recommendation immediately
+      // Show recommendation immediately
       if (data?.recommendation) {
-        console.log("📊 Recommendation:", data.recommendation);
-        // alert(JSON.stringify(data.recommendation, null, 2));
+        setRecommendationData(data.recommendation);
+      } else {
+        // If no recommendation, proceed with cleanup
+        cleanupAndRedirect();
       }
-      window.location.href = "https://kaushik-dev.online";
+    } else {
+      // If no sessionId, just cleanup
+      cleanupAndRedirect();
     }
+  } catch (err) {
+    console.error("Logout/session complete failed:", err);
+    cleanupAndRedirect();
+  }
+};
 
+const cleanupAndRedirect = async () => {
+  try {
     await fetch(`${API}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
     });
-
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("student_id");
-    sessionStorage.removeItem("session_id");
-
-    setUser(null);
-    setSessionId(null);
-
-  } catch (err) {
-    console.error("Logout/session complete failed:", err);
+  } catch (e) {
+    console.warn("Auth logout call failed, cleaning up locally anyway.");
   }
+
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("student_id");
+  sessionStorage.removeItem("session_id");
+
+  setUser(null);
+  setSessionId(null);
+  window.location.href = "https://kaushik-dev.online";
 };
 
   // ✅ BKT UPDATE
@@ -488,6 +507,14 @@ const handleLogout = async () => {
         onConfirm={() => {
           setShowExitModal(false);
           handleLogout();
+        }}
+      />
+
+      <RecommendationModal 
+        data={recommendationData} 
+        onClose={() => {
+          setRecommendationData(null);
+          cleanupAndRedirect();
         }}
       />
     </div>

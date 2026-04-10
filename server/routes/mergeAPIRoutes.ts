@@ -136,7 +136,7 @@ const syncSessionInteraction = async (req: Request, res: Response) => {
     const sessionPayload = {
       student_id: (session as any).externalStudentId || session.student_id, 
       session_id: (session as any).externalSessionId || session.session_id, // Unique reusable ID for safe idempotent network retries
-      chapter_id: "grade6_data_handling", 
+      chapter_id: "grade6_data_handling_and_probability", 
       timestamp: new Date().toISOString(),
       session_status: session_status || (session.endTime ? "completed" : "exited_midway"),
       questions_attempted,
@@ -197,7 +197,7 @@ const handleMidwayExit = async (req: Request, res: Response) => {
     await session.save();
 
     req.body.session_status = "exited_midway";
-    return syncSessionInteraction(req, res);
+    return await syncSessionInteraction(req, res);
   } catch (error: any) {
     return res.status(500).json({ error: "Failed to handle midway trigger event", details: error.message });
   }
