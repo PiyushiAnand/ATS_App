@@ -298,6 +298,7 @@ const handleLogout = async () => {
         console.log("📊 Recommendation:", data.recommendation);
         alert(JSON.stringify(data.recommendation, null, 2));
       }
+      window.location.href = "https://kaushik-dev.online";
     }
 
     await fetch(`${API}/api/auth/logout`, {
