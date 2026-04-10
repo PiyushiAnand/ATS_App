@@ -240,11 +240,13 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
     const responses = await UserResponse.find({ session_id });
 
     if (!session) {
+      console.warn("⚠️ Session not found for ID:", session_id);
       return res.status(404).json({
         error: "Session not found."
       });
     }
     if (responses.length === 0) {
+      console.warn("⚠️ No responses found for session:", session_id);
       return res.status(404).json({
         message: "No responses found for this session."
       });
@@ -260,6 +262,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
     );
 
     if (!updatedSession) {
+      console.error("Failed to update session end time for ID:", session_id);
       return res.status(404).json({ error: "Session update failed." });
     }
 

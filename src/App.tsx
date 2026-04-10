@@ -296,6 +296,7 @@ const handleLogout = async () => {
       // Optional: show recommendation immediately
       if (data?.recommendation) {
         console.log("📊 Recommendation:", data.recommendation);
+        alert(JSON.stringify(data.recommendation, null, 2));
       }
     }
 
