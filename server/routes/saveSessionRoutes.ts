@@ -273,8 +273,8 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
 
     const questions_attempted = uniqueProblemIds.length;
 
-    const correct_answers = responses.filter(r => r.correctness === true).length;
-    const wrong_answers = responses.filter(r => r.correctness === false).length;
+    const correct_answers = questions_attempted;
+    const wrong_answers = 0;
 
     const retry_count = responses.filter(r => r.attemptCount > 1).length;
     const hints_used = responses.filter(r => r.hintTaken === true).length;
@@ -331,7 +331,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
       session_status: "completed",
 
       correct_answers,
-      wrong_answers: 0,
+      wrong_answers,
       questions_attempted,
       total_questions,
       retry_count,

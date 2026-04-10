@@ -297,7 +297,7 @@ const handleLogout = async () => {
       // Optional: show recommendation immediately
       if (data?.recommendation) {
         console.log("📊 Recommendation:", data.recommendation);
-        alert(JSON.stringify(data.recommendation, null, 2));
+        // alert(JSON.stringify(data.recommendation, null, 2));
       }
       window.location.href = "https://kaushik-dev.online";
     }
