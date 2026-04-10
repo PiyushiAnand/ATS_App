@@ -21,8 +21,7 @@ router.get("/me", authenticate, async (req: AuthRequest, res: Response) => {
 
     // ✅ Return safe response
     res.json({ 
-      name: user.name || "", 
-      email: user.email || "", 
+      name: user.user_id || "", 
       mastery: user.mastery || {}, 
       completedTopics: user.completedTopics || [] 
     });
