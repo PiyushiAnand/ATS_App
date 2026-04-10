@@ -326,7 +326,7 @@ router.post("/complete", authenticate, async (req: AuthRequest, res: Response) =
     const payload = {
       student_id: updatedSession.student_id,
       session_id: updatedSession.session_id,
-      chapter_id: "grade6_data_handling",
+      chapter_id: "grade6_data_handling_and_probability",
       timestamp: new Date().toISOString(),
       session_status: "completed",
 
