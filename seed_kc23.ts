@@ -137,7 +137,7 @@ const lessonsData = [
     learningContent: "A random experiment is an action where the result cannot be predicted exactly. Each possible result is called an outcome. Even though we know all possible outcomes, we cannot be sure which one will happen.",
     exampleText: "When you toss a coin, the outcomes are Head (H) or Tail (T). When you roll a die, the outcomes are 1, 2, 3, 4, 5, or 6.",
     mediaUrl: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Dice.jpg",
-    videoUrl: "https://youtu.https://youtu.be/DVCPcXvEdq4?si=tm94eGrVIEYQWuuN/v6gZ5LiEouQ?si=xfbK4mjifs_VSysZ",
+    videoUrl: " https://youtu.be/DVCPcXvEdq4?si=tm94eGrVIEYQWuuN",
     animation: {
   type: "coin-flip",
   config: {
@@ -184,7 +184,7 @@ const lessonsData = [
     learningContent: "An event is a specific outcome or a group of outcomes that we are interested in. Events can have one or more outcomes depending on the situation.",
     exampleText: "When rolling a die, the event 'getting an even number' includes outcomes {2, 4, 6}. So, probability = 3/6 = 1/2.",
     mediaUrl: "https://www.onlinemathlearning.com/image-files/probability-events.png",
-    videoUrl: "https://youtu.be/https://www.youtube.com/watch?v=v6gZ5LiEouQ-_ihDKr2M?si=0OtYuW8ADX6FSbyQ&t=2",
+    videoUrl: "https://www.youtube.com/watch?v=v6gZ5LiEouQ",
    
   },
   {
